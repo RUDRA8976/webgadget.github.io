@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+  <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Rotator & Viewer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- ✅ Link favicon from 'favicon' folder -->
+  <link rel="icon" href="favicon/favicon.png" type="image/png"> 
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #2b6cb0 100%);
+    }
+    #dropZone {
+      background: linear-gradient(135deg, rgba(155, 89, 182, 0.05), rgba(255, 255, 255, 0.1));
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+    }
+    #dropZone.highlight {
+      border-color: #9b59b6;
+      background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(255, 255, 255, 0.2));
+      transform: scale(1.02);
+    }
+    .btn {
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(155, 89, 182, 0.3);
+    }
+    #previewCanvas {
+      transition: transform 0.3s ease;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .dark .glass-card {
+      background: rgba(31, 41, 55, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .dark {
+      background: linear-gradient(135deg, #1e1b4b 0%, #1e40af 100%);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 transition-colors duration-300">
+  <div class="glass-card rounded-3xl shadow-2xl p-8 w-full max-w-lg">
+    <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-6">Image Rotator & Viewer</h1>
+    
+    <!-- Drag and Drop Area -->
+    <div id="dropZone" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-8 text-center cursor-pointer">
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" class="hidden">
+      <p class="text-gray-600 dark:text-gray-300 text-lg">Drag & drop your image or <span class="text-violet-500 font-medium">click to upload</span> (JPG, PNG, WEBP)</p>
+    </div>
+
+    <!-- Preview Area -->
+    <div id="preview" class="mt-6 hidden">
+      <h2 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">Preview</h2>
+      <div class="relative flex justify-center bg-gray-50 dark:bg-gray-700 rounded-2xl p-4">
+        <canvas id="previewCanvas" class="w-full h-auto rounded-lg max-h-80"></canvas>
+      </div>
+      <p class="text-center text-gray-600 dark:text-gray-300 mt-3 text-sm">Rotation: <span id="degreeDisplay" class="font-medium">0</span>°</p>
+    </div>
+
+    <!-- Controls -->
+    <div id="controls" class="mt-6 flex flex-wrap justify-center gap-3 hidden">
+      <button id="rotateLeft" class="btn bg-violet-600 text-white px-6 py-3 rounded-lg text-sm font-medium">Rotate Left</button>
+      <button id="rotateRight" class="btn bg-violet-600 text-white px-6 py-3 rounded-lg text-sm font-medium">Rotate Right</button>
+      <button id="reset" class="btn bg-gray-500 text-white px-6 py-3 rounded-lg text-sm font-medium">Reset</button>
+      <button id="download" class="btn bg-violet-600 text-white px-6 py-3 rounded-lg text-sm font-medium">Download</button>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <div class="mt-6 flex justify-end">
+      <button id="darkModeToggle" class="text-gray-600 dark:text-gray-300 hover:text-violet-500 dark:hover:text-violet-400 p-2 rounded-full bg-gray-200 dark:bg-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Privacy Note -->
+    <p class="mt-6 text-sm text-gray-500 dark:text-gray-400 text-center">
+      🔒 All processing is done locally in your browser. No uploads required.
+    </p>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const preview = document.getElementById('preview');
+    const previewCanvas = document.getElementById('previewCanvas');
+    const degreeDisplay = document.getElementById('degreeDisplay');
+    const controls = document.getElementById('controls');
+    const rotateLeft = document.getElementById('rotateLeft');
+    const rotateRight = document.getElementById('rotateRight');
+    const reset = document.getElementById('reset');
+    const download = document.getElementById('download');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    let rotation = 0;
+    let image = new Image();
+    const ctx = previewCanvas.getContext('2d');
+
+    // Drag and Drop Handlers
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('highlight');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('highlight'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('highlight');
+      const file = e.dataTransfer.files[0];
+      handleFile(file);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      handleFile(file);
+    });
+
+    function handleFile(file) {
+      if (!file || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        image.src = reader.result;
+        image.onload = () => {
+          updateCanvas();
+          preview.classList.remove('hidden');
+          controls.classList.remove('hidden');
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateCanvas() {
+      const maxSize = 320; // Max height for canvas
+      let width = image.width;
+      let height = image.height;
+      if (height > maxSize) {
+        width = (maxSize / height) * width;
+        height = maxSize;
+      }
+      previewCanvas.width = Math.abs(width);
+      previewCanvas.height = height;
+
+      ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+      ctx.save();
+      ctx.translate(width / 2, height / 2);
+      ctx.rotate((rotation * Math.PI) / 180);
+      ctx.drawImage(image, -width / 2, -height / 2, width, height);
+      ctx.restore();
+      degreeDisplay.textContent = rotation;
+    }
+
+    rotateLeft.addEventListener('click', () => {
+      rotation = (rotation - 90) % 360;
+      updateCanvas();
+      previewCanvas.style.transform = 'scale(1.05)';
+      setTimeout(() => (previewCanvas.style.transform = 'scale(1)'), 300);
+    });
+
+    rotateRight.addEventListener('click', () => {
+      rotation = (rotation + 90) % 360;
+      updateCanvas();
+      previewCanvas.style.transform = 'scale(1.05)';
+      setTimeout(() => (previewCanvas.style.transform = 'scale(1)'), 300);
+    });
+
+    reset.addEventListener('click', () => {
+      rotation = 0;
+      updateCanvas();
+      previewCanvas.style.transform = 'scale(1.05)';
+      setTimeout(() => (previewCanvas.style.transform = 'scale(1)'), 300);
+    });
+
+    download.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'rotated-image.png';
+      link.href = previewCanvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Dark Mode Toggle
+    darkModeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark');
+    });
+  </script>
+</body>
+</html>

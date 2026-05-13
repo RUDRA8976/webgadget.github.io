@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type='text/javascript' src='//hootpreceding.com/75/37/67/7537671fc8b8445af473b6f7f5566a17.js'></script>
+    <script type='text/javascript' src='//hootpreceding.com/75/37/67/7537671fc8b8445af473b6f7f5566a17.js'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Calculator</title>
+    <!-- ✅ Link favicon from 'favicon' folder -->
+    <link rel="icon" href="favicon/favicon.png" type="image/png"> 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .calculator {
+            background-color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            color: #D4AF37;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .input-container {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-size: 1.1rem;
+        }
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 2px solid #D4AF37;
+            border-radius: 5px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .result-card {
+            background-color: #fff;
+            border: 2px solid #D4AF37;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .result-card h2 {
+            color: #D4AF37;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+        .result-card p {
+            color: #333;
+            font-size: 1.1rem;
+            margin: 5px 0;
+        }
+        button {
+            background-color: #D4AF37;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+            touch-action: manipulation;
+        }
+        button:hover {
+            background-color: #b8972f;
+        }
+        @media (max-width: 600px) {
+            .calculator {
+                width: 95%;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .result-card h2 {
+                font-size: 1.2rem;
+            }
+            .result-card p {
+                font-size: 1rem;
+            }
+            input[type="date"] {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>Age Calculator</h1>
+        <div class="input-container">
+            <label for="birthdate">Enter Your Birthdate:</label>
+            <input type="date" id="birthdate" onchange="calculateAge()">
+        </div>
+        <div class="result-card" id="result" style="display: none;">
+            <h2>Your Age</h2>
+            <p id="age"></p>
+            <h2>Next Birthday</h2>
+            <p id="next-birthday"></p>
+            <p id="days-until"></p>
+        </div>
+        <button onclick="clearInput()">Clear</button>
+    </div>
+    <script>
+        function calculateAge() {
+            const birthdateInput = document.getElementById('birthdate').value;
+            if (!birthdateInput) return;
+
+            const birthdate = new Date(birthdateInput);
+            const today = new Date();
+
+            // Calculate age
+            let years = today.getFullYear() - birthdate.getFullYear();
+            let months = today.getMonth() - birthdate.getMonth();
+            let days = today.getDate() - birthdate.getDate();
+
+            if (days < 0) {
+                months--;
+                days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            // Calculate next birthday
+            let nextBirthdayYear = today.getFullYear();
+            if (today.getMonth() > birthdate.getMonth() || 
+                (today.getMonth() === birthdate.getMonth() && today.getDate() > birthdate.getDate())) {
+                nextBirthdayYear++;
+            }
+            const nextBirthday = new Date(nextBirthdayYear, birthdate.getMonth(), birthdate.getDate());
+            
+            // Calculate days until next birthday
+            const timeDiff = nextBirthday - today;
+            const daysUntil = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+            // Format next birthday date
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedNextBirthday = nextBirthday.toLocaleDateString('en-US', options);
+
+            // Update result display
+            document.getElementById('age').textContent = `${years} years, ${months} months, ${days} days`;
+            document.getElementById('next-birthday').textContent = formattedNextBirthday;
+            document.getElementById('days-until').textContent = `${daysUntil} days until your next birthday`;
+            document.getElementById('result').style.display = 'block';
+        }
+
+        function clearInput() {
+            document.getElementById('birthdate').value = '';
+            document.getElementById('result').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

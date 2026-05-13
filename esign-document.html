@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+  <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eSign - Digital Signature Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <!-- ✅ Link favicon from 'favicon' folder -->
+  <link rel="icon" href="favicon/favicon.png" type="image/png">
+</head>
+<body class="bg-white text-gray-800 font-sans">
+  <!-- Header Section -->
+  <header class="bg-[#4A148C] text-white p-4 text-center">
+    <h1 class="text-2xl md:text-3xl font-bold">eSign - Digital Signature Tool</h1>
+    <p class="text-sm md:text-base mt-2">Sign documents digitally in seconds!</p>
+  </header>
+
+  <!-- Main Function Area -->
+  <main class="max-w-7xl mx-auto p-4 md:p-6">
+    <!-- Document Upload Zone -->
+    <section class="mb-6">
+      <h2 class="text-lg md:text-xl font-semibold text-[#4A148C] mb-2">Upload Document</h2>
+      <div id="dropZone" class="border-2 border-dashed border-[#7B1FA2] p-6 rounded-lg text-center hover:bg-[#f3e8ff]">
+        <p class="text-sm md:text-base text-gray-600">Drag & drop your file here or</p>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.png,.jpg,.jpeg" class="hidden">
+        <button onclick="document.getElementById('fileInput').click()" class="mt-2 bg-[#4A148C] text-white px-4 py-2 rounded hover:bg-[#7B1FA2] focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Browse files">Browse Files</button>
+        <p class="text-xs text-gray-500 mt-2">Supported formats: PDF, DOCX, PNG, JPG</p>
+      </div>
+    </section>
+
+    <!-- Signature Creation Panel -->
+    <section class="mb-6">
+      <h2 class="text-lg md:text-xl font-semibold text-[#4A148C] mb-2">Create Signature</h2>
+      <div class="flex flex-col md:flex-row gap-4">
+        <!-- Tabs -->
+        <div class="flex border-b border-[#7B1FA2]">
+          <button id="drawTab" class="px-4 py-2 font-medium text-[#4A148C] border-b-2 border-transparent hover:border-[#7B1FA2] focus:outline-none" aria-selected="true">Draw</button>
+          <button id="typeTab" class="px-4 py-2 font-medium text-[#4A148C] border-b-2 border-transparent hover:border-[#7B1FA2] focus:outline-none">Type</button>
+          <button id="uploadTab" class="px-4 py-2 font-medium text-[#4A148C] border-b-2 border-transparent hover:border-[#7B1FA2] focus:outline-none">Upload</button>
+        </div>
+      </div>
+
+      <!-- Draw Panel -->
+      <div id="drawPanel" class="mt-4">
+        <canvas id="signatureCanvas" class="border border-[#7B1FA2] w-full h-40 md:h-48 rounded-lg" role="img" aria-label="Signature drawing canvas"></canvas>
+        <div class="flex gap-2 mt-2">
+          <button id="clearCanvas" class="bg-[#7B1FA2] text-white px-3 py-1 rounded hover:bg-[#4A148C] focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Clear signature">Clear</button>
+          <select id="colorPicker" class="border border-[#7B1FA2] rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Select signature color">
+            <option value="#000000">Black</option>
+            <option value="#0000FF">Blue</option>
+            <option value="#FF0000">Red</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Type Panel -->
+      <div id="typePanel" class="mt-4 hidden">
+        <input type="text" id="signatureText" placeholder="Type your name" class="border border-[#7B1FA2] rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Type your signature">
+        <select id="fontPicker" class="mt-2 border border-[#7B1FA2] rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Select signature font">
+          <option value="Dancing Script">Dancing Script</option>
+          <option value="Great Vibes">Great Vibes</option>
+          <option value="Sacramento">Sacramento</option>
+        </select>
+        <canvas id="textCanvas" class="border border-[#7B1FA2] w-full h-40 md:h-48 rounded-lg mt-2" role="img" aria-label="Typed signature preview"></canvas>
+      </div>
+
+      <!-- Upload Panel -->
+      <div id="uploadPanel" class="mt-4 hidden">
+        <input type="file" id="signatureUpload" accept=".png,.jpg,.jpeg" class="border border-[#7B1FA2] rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Upload signature image">
+        <img id="uploadedSignature" class="mt-2 max-w-full h-40 md:h-48 hidden" alt="Uploaded signature preview">
+      </div>
+    </section>
+
+    <!-- Document Preview & Signature Placement -->
+    <section class="mb-6">
+      <h2 class="text-lg md:text-xl font-semibold text-[#4A148C] mb-2">Preview & Place Signature</h2>
+      <div class="relative border border-[#7B1FA2] rounded-lg p-4 bg-[#f3e8ff]">
+        <canvas id="previewCanvas" class="w-full h-[400px] md:h-[600px] rounded-lg" role="img" aria-label="Document preview with signature"></canvas>
+        <div id="signatureBox" class="absolute hidden border border-[#7B1FA2] bg-white bg-opacity-50 cursor-move">
+          <img id="signatureImage" alt="Placed signature">
+          <div class="absolute top-0 right-0 flex gap-1 p-1">
+            <button id="resizeSignature" class="bg-[#7B1FA2] text-white p-1 rounded text-xs" aria-label="Resize signature">↔</button>
+            <button id="rotateSignature" class="bg-[#7B1FA2] text-white p-1 rounded text-xs" aria-label="Rotate signature">↻</button>
+            <input type="range" id="opacitySlider" min="0.1" max="1" step="0.1" value="1" class="w-16" aria-label="Adjust signature opacity">
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-2 mt-2">
+        <button id="undoBtn" class="bg-[#7B1FA2] text-white px-3 py-1 rounded hover:bg-[#4A148C] focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Undo">Undo</button>
+        <button id="redoBtn" class="bg-[#7B1FA2] text-white px-3 py-1 rounded hover:bg-[#4A148C] focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Redo">Redo</button>
+        <button id="placeSignature" class="bg-[#4A148C] text-white px-3 py-1 rounded hover:bg-[#7B1FA2] focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Place signature">Place Signature</button>
+      </div>
+    </section>
+
+    <!-- Action Buttons -->
+    <section class="flex flex-col md:flex-row gap-4">
+      <button id="downloadBtn" class="bg-[#4A148C] text-white px-4 py-2 rounded hover:bg-[#7B1FA2] focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Download signed document">Download Signed Document</button>
+      <button id="shareBtn" class="bg-[#7B1FA2] text-white px-4 py-2 rounded hover:bg-[#4A148C] focus:outline-none focus:ring-2 focus:ring-[#7B1FA2]" aria-label="Share via email">Share via Email</button>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="bg-[#4A148C] text-white p-4 text-center">
+    <label class="flex items-center justify-center gap-2 text-sm">
+      <input type="checkbox" id="saveSignature" class="h-4 w-4 text-[#7B1FA2] focus:ring-[#7B1FA2]" aria-label="Save signature for future use">
+      Save Signature for Future Use
+    </label>
+    <p class="text-xs mt-2">For non-legal use only</p>
+  </footer>
+
+  <!-- Notifications -->
+  <div id="notification" class="fixed top-4 right-4 bg-[#4A148C] text-white px-4 py-2 rounded hidden" role="alert"></div>
+
+  <script>
+    // Initialize PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    // Canvas and context
+    const signatureCanvas = document.getElementById('signatureCanvas');
+    const ctx = signatureCanvas.getContext('2d');
+    const textCanvas = document.getElementById('textCanvas');
+    const textCtx = textCanvas.getContext('2d');
+    const previewCanvas = document.getElementById('previewCanvas');
+    const previewCtx = previewCanvas.getContext('2d');
+
+    // Tab management
+    const drawTab = document.getElementById('drawTab');
+    const typeTab = document.getElementById('typeTab');
+    const uploadTab = document.getElementById('uploadTab');
+    const drawPanel = document.getElementById('drawPanel');
+    const typePanel = document.getElementById('typePanel');
+    const uploadPanel = document.getElementById('uploadPanel');
+
+    // Signature controls
+    const signatureBox = document.getElementById('signatureBox');
+    const signatureImage = document.getElementById('signatureImage');
+    const clearCanvasBtn = document.getElementById('clearCanvas');
+    const colorPicker = document.getElementById('colorPicker');
+    const fontPicker = document.getElementById('fontPicker');
+    const signatureText = document.getElementById('signatureText');
+    const signatureUpload = document.getElementById('signatureUpload');
+    const uploadedSignature = document.getElementById('uploadedSignature');
+    const placeSignatureBtn = document.getElementById('placeSignature');
+    const resizeSignatureBtn = document.getElementById('resizeSignature');
+    const rotateSignatureBtn = document.getElementById('rotateSignature');
+    const opacitySlider = document.getElementById('opacitySlider');
+    const undoBtn = document.getElementById('undoBtn');
+    const redoBtn = document.getElementById('redoBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    const saveSignatureCheckbox = document.getElementById('saveSignature');
+    const notification = document.getElementById('notification');
+
+    let isDrawing = false;
+    let signatureData = null;
+    let documentFile = null;
+    let signaturePos = { x: 0, y: 0, scale: 1, rotation: 0, opacity: 1 };
+    let history = [];
+    let redoStack = [];
+
+    // Responsive canvas sizing
+    function resizeCanvases() {
+      signatureCanvas.width = signatureCanvas.offsetWidth;
+      signatureCanvas.height = signatureCanvas.offsetWidth * 0.5;
+      textCanvas.width = textCanvas.offsetWidth;
+      textCanvas.height = textCanvas.offsetWidth * 0.5;
+      previewCanvas.width = previewCanvas.offsetWidth;
+      previewCanvas.height = previewCanvas.offsetWidth * 1.5;
+    }
+    window.addEventListener('resize', resizeCanvases);
+    resizeCanvases();
+
+    // Tab switching
+    drawTab.addEventListener('click', () => switchTab('draw'));
+    typeTab.addEventListener('click', () => switchTab('type'));
+    uploadTab.addEventListener('click', () => switchTab('upload'));
+
+    function switchTab(tab) {
+      drawTab.classList.remove('border-[#4A148C]');
+      typeTab.classList.remove('border-[#4A148C]');
+      uploadTab.classList.remove('border-[#4A148C]');
+      drawPanel.classList.add('hidden');
+      typePanel.classList.add('hidden');
+      uploadPanel.classList.add('hidden');
+
+      if (tab === 'draw') {
+        drawTab.classList.add('border-[#4A148C]');
+        drawPanel.classList.remove('hidden');
+      } else if (tab === 'type') {
+        typeTab.classList.add('border-[#4A148C]');
+        typePanel.classList.remove('hidden');
+      } else if (tab === 'upload') {
+        uploadTab.classList.add('border-[#4A148C]');
+        uploadPanel.classList.remove('hidden');
+      }
+    }
+
+    // Drawing on canvas
+    signatureCanvas.addEventListener('mousedown', startDrawing);
+    signatureCanvas.addEventListener('mousemove', draw);
+    signatureCanvas.addEventListener('mouseup', stopDrawing);
+    signatureCanvas.addEventListener('touchstart', (e) => startDrawing(e.touches[0]));
+    signatureCanvas.addEventListener('touchmove', (e) => draw(e.touches[0]));
+    signatureCanvas.addEventListener('touchend', stopDrawing);
+
+    function startDrawing(e) {
+      isDrawing = true;
+      ctx.beginPath();
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      const rect = signatureCanvas.getBoundingClientRect();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const rect = signatureCanvas.getBoundingClientRect();
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.stroke();
+    }
+
+    function stopDrawing() {
+      if (isDrawing) {
+        isDrawing = false;
+        signatureData = signatureCanvas.toDataURL();
+        if (saveSignatureCheckbox.checked) {
+          localStorage.setItem('savedSignature', signatureData);
+          showNotification('Signature saved!');
+        }
+      }
+    }
+
+    // Clear canvas
+    clearCanvasBtn.addEventListener('click', () => {
+      ctx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
+      signatureData = null;
+    });
+
+    // Typed signature
+    signatureText.addEventListener('input', () => {
+      textCtx.clearRect(0, 0, textCanvas.width, textCanvas.height);
+      textCtx.font = `40px "${fontPicker.value}"`;
+      textCtx.fillStyle = colorPicker.value;
+      textCtx.fillText(signatureText.value, 10, 50);
+      signatureData = textCanvas.toDataURL();
+    });
+
+    // Uploaded signature
+    signatureUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          uploadedSignature.src = event.target.result;
+          uploadedSignature.classList.remove('hidden');
+          signatureData = event.target.result;
+          if (saveSignatureCheckbox.checked) {
+            localStorage.setItem('savedSignature', signatureData);
+            showNotification('Signature saved!');
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Document upload
+    document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+    dropZone.addEventListener('dragover', (e) => e.preventDefault());
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      handleFileUpload({ target: { files: e.dataTransfer.files } });
+    });
+
+    async function handleFileUpload(e) {
+      documentFile = e.target.files[0];
+      if (!documentFile) return;
+      if (documentFile.type === 'application/pdf') {
+        const arrayBuffer = await documentFile.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+        const page = await pdf.getPage(1);
+        const viewport = page.getViewport({ scale: 1 });
+        previewCanvas.width = viewport.width;
+        previewCanvas.height = viewport.height;
+        await page.render({ canvasContext: previewCtx, viewport }).promise;
+      } else if (documentFile.type.startsWith('image/')) {
+        const img = new Image();
+        img.onload = () => {
+          previewCanvas.width = img.width;
+          previewCanvas.height = img.height;
+          previewCtx.drawImage(img, 0, 0);
+        };
+        img.src = URL.createObjectURL(documentFile);
+      } else {
+        showNotification('Unsupported file format!', true);
+      }
+    }
+
+    // Signature placement
+    placeSignatureBtn.addEventListener('click', () => {
+      if (!signatureData || !documentFile) {
+        showNotification('Please upload a document and create a signature!', true);
+        return;
+      }
+      signatureImage.src = signatureData;
+      signatureBox.classList.remove('hidden');
+      signaturePos = { x: 50, y: 50, scale: 1, rotation: 0, opacity: 1 };
+      updateSignature();
+      history.push({ ...signaturePos });
+      redoStack = [];
+    });
+
+    // Signature manipulation
+    let isDragging = false;
+    let isResizing = false;
+    signatureBox.addEventListener('mousedown', (e) => {
+      if (e.target === resizeSignatureBtn) {
+        isResizing = true;
+      } else {
+        isDragging = true;
+      }
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const rect = previewCanvas.getBoundingClientRect();
+        signaturePos.x = e.clientX - rect.left;
+        signaturePos.y = e.clientY - rect.top;
+        updateSignature();
+      } else if (isResizing) {
+        signaturePos.scale = Math.max(0.5, Math.min(2, signaturePos.scale + e.movementX / 100));
+        updateSignature();
+      }
+    });
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+      isResizing = false;
+      if (history[history.length - 1]?.x !== signaturePos.x || history[history.length - 1]?.y !== signaturePos.y || history[history.length - 1]?.scale !== signaturePos.scale) {
+        history.push({ ...signaturePos });
+      }
+    });
+
+    rotateSignatureBtn.addEventListener('click', () => {
+      signaturePos.rotation += 90;
+      updateSignature();
+      history.push({ ...signaturePos });
+    });
+
+    opacitySlider.addEventListener('input', () => {
+      signaturePos.opacity = opacitySlider.value;
+      updateSignature();
+      history.push({ ...signaturePos });
+    });
+
+    function updateSignature() {
+      signatureBox.style.left = `${signaturePos.x}px`;
+      signatureBox.style.top = `${signaturePos.y}px`;
+      signatureBox.style.transform = `scale(${signaturePos.scale}) rotate(${signaturePos.rotation}deg)`;
+      signatureImage.style.opacity = signaturePos.opacity;
+    }
+
+    // Undo/Redo
+    undoBtn.addEventListener('click', () => {
+      if (history.length > 1) {
+        redoStack.push(history.pop());
+        signaturePos = { ...history[history.length - 1] };
+        updateSignature();
+      }
+    });
+
+    redoBtn.addEventListener('click', () => {
+      if (redoStack.length > 0) {
+        signaturePos = redoStack.pop();
+        history.push({ ...signaturePos });
+        updateSignature();
+      }
+    });
+
+    // Download
+    downloadBtn.addEventListener('click', async () => {
+      if (!documentFile || !signatureData) {
+        showNotification('Please upload a document and create a signature!', true);
+        return;
+      }
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = previewCanvas.width;
+      tempCanvas.height = previewCanvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(previewCanvas, 0, 0);
+      const img = new Image();
+      img.src = signatureData;
+      img.onload = () => {
+        tempCtx.translate(signaturePos.x, signaturePos.y);
+        tempCtx.rotate((signaturePos.rotation * Math.PI) / 180);
+        tempCtx.scale(signaturePos.scale, signaturePos.scale);
+        tempCtx.globalAlpha = signaturePos.opacity;
+        tempCtx.drawImage(img, 0, 0);
+        const link = document.createElement('a');
+        link.href = tempCanvas.toDataURL('image/png');
+        link.download = 'signed_document.png';
+        link.click();
+      };
+    });
+
+    // Share via email
+    shareBtn.addEventListener('click', () => {
+      if (!documentFile || !signatureData) {
+        showNotification('Please upload a document and create a signature!', true);
+        return;
+      }
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = previewCanvas.width;
+      tempCanvas.height = previewCanvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(previewCanvas, 0, 0);
+      const img = new Image();
+      img.src = signatureData;
+      img.onload = () => {
+        tempCtx.translate(signaturePos.x, signaturePos.y);
+        tempCtx.rotate((signaturePos.rotation * Math.PI) / 180);
+        tempCtx.scale(signaturePos.scale, signaturePos.scale);
+        tempCtx.globalAlpha = signaturePos.opacity;
+        tempCtx.drawImage(img, 0, 0);
+        const dataUrl = tempCanvas.toDataURL('image/png');
+        const subject = encodeURIComponent('Signed Document');
+        const body = encodeURIComponent('Please find the signed document attached.');
+        window.location.href = `mailto:?subject=${subject}&body=${body}&attachment=${dataUrl}`;
+      };
+    });
+
+    // Notification
+    function showNotification(message, isError = false) {
+      notification.textContent = message;
+      notification.classList.remove('hidden', isError ? 'bg-green-500' : 'bg-red-500');
+      notification.classList.add(isError ? 'bg-red-500' : 'bg-green-500');
+      setTimeout(() => notification.classList.add('hidden'), 3000);
+    }
+
+    // Load saved signature
+    if (localStorage.getItem('savedSignature')) {
+      signatureData = localStorage.getItem('savedSignature');
+      signatureImage.src = signatureData;
+      uploadedSignature.src = signatureData;
+      uploadedSignature.classList.remove('hidden');
+      switchTab('upload');
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script&family=Great+Vibes&family=Sacramento&display=swap');
+    #signatureBox {
+      user-select: none;
+    }
+    canvas {
+      touch-action: none;
+    }
+    @media (max-width: 640px) {
+      #previewCanvas {
+        height: 300px !important;
+      }
+      #signatureCanvas, #textCanvas {
+        height: 150px !important;
+      }
+      button, input, select {
+        font-size: 0.9rem;
+      }
+    }
+  </style>

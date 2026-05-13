@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type='text/javascript' src='//hootpreceding.com/75/37/67/7537671fc8b8445af473b6f7f5566a17.js'></script>
+    <script type='text/javascript' src='//hootpreceding.com/75/37/67/7537671fc8b8445af473b6f7f5566a17.js'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Percentile Calculator for competetive exams</title>
+    <!-- ✅ Link favicon from 'favicon' folder -->
+    <link rel="icon" href="favicon/favicon.png" type="image/png"> 
+    <style>
+        /* General styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        /* Card container */
+        .calculator-card {
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        /* Title styling */
+        h1 {
+            font-size: 1.8rem;
+            color: #5C4033;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Input group styling */
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #5C4033;
+        }
+
+        /* Subject-wise inputs for JEE */
+        #jee-subjects {
+            display: none;
+        }
+
+        /* Button styling */
+        button {
+            width: 100%;
+            padding: 0.8rem;
+            background-color: #5C4033;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #4A3529;
+        }
+
+        /* Result and error styling */
+        #result, #error {
+            margin-top: 1.5rem;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        #error {
+            color: #d32f2f;
+            display: none;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            .calculator-card {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            input, textarea, select, button {
+                font-size: 0.9rem;
+                padding: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-card">
+        <h1>Percentile Calculator for JEE, NEET, GATE</h1>
+        <div class="input-group">
+            <label for="exam-type">Select Exam</label>
+            <select id="exam-type" onchange="toggleJeeInputs()">
+                <option value="jee">JEE Main</option>
+                <option value="neet">NEET</option>
+                <option value="gate">GATE</option>
+                <option value="gate">Other Exams</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="dataset">Enter Dataset (comma or space-separated scores)</label>
+            <textarea id="dataset" placeholder="e.g., 150, 160, 170 or 150 160 170"></textarea>
+        </div>
+        <div class="input-group" id="jee-subjects">
+            <label>Subject-Wise Scores (JEE Main Only)</label>
+            <div class="input-group">
+                <label for="maths">Maths Score</label>
+                <input type="number" id="maths" placeholder="Enter Maths score" step="0.1">
+            </div>
+            <div class="input-group">
+                <label for="physics">Physics Score</label>
+                <input type="number" id="physics" placeholder="Enter Physics score" step="0.1">
+            </div>
+            <div class="input-group">
+                <label for="chemistry">Chemistry Score</label>
+                <input type="number" id="chemistry" placeholder="Enter Chemistry score" step="0.1">
+            </div>
+        </div>
+        <div class="input-group">
+            <label for="percentile">Enter Percentile Value (0-100)</label>
+            <input type="number" id="percentile" placeholder="e.g., 25, 50, 90" step="0.1">
+        </div>
+        <button onclick="calculatePercentile()">Calculate</button>
+        <div id="result"></div>
+        <div id="error"></div>
+    </div>
+
+    <script>
+        // Toggle JEE subject inputs based on exam selection
+        function toggleJeeInputs() {
+            const examType = document.getElementById('exam-type').value;
+            const jeeSubjects = document.getElementById('jee-subjects');
+            jeeSubjects.style.display = examType === 'jee' ? 'block' : 'none';
+        }
+
+        // Function to calculate percentile
+        function calculatePercentile() {
+            // Get input elements
+            const examType = document.getElementById('exam-type').value;
+            const datasetInput = document.getElementById('dataset').value.trim();
+            const percentile = parseFloat(document.getElementById('percentile').value);
+            const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error');
+            let maths = parseFloat(document.getElementById('maths').value);
+            let physics = parseFloat(document.getElementById('physics').value);
+            let chemistry = parseFloat(document.getElementById('chemistry').value);
+
+            // Reset previous messages
+            resultDiv.innerHTML = '';
+            errorDiv.style.display = 'none';
+
+            // Input validation
+            if (!datasetInput) {
+                errorDiv.innerHTML = 'Please enter a dataset.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            if (isNaN(percentile) || percentile < 0 || percentile > 100) {
+                errorDiv.innerHTML = 'Please enter a valid percentile value (0-100).';
+                errorDiv.style.display = 'block';
+                return;
+            }
+            if (examType === 'jee' && (isNaN(maths) || isNaN(physics) || isNaN(chemistry))) {
+                errorDiv.innerHTML = 'Please enter valid scores for Maths, Physics, and Chemistry.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Parse dataset
+            const numbers = datasetInput
+                .split(/[\s,]+/)
+                .map(num => parseFloat(num))
+                .filter(num => !isNaN(num));
+
+            if (numbers.length === 0) {
+                errorDiv.innerHTML = 'Please enter valid numbers in the dataset.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Sort numbers in ascending order
+            numbers.sort((a, b) => a - b);
+
+            // Calculate percentile for dataset
+            const p = percentile / 100;
+            const n = numbers.length;
+            const index = p * (n - 1);
+            let percentileValue;
+
+            if (Number.isInteger(index)) {
+                percentileValue = numbers[index];
+            } else {
+                const lowerIndex = Math.floor(index);
+                const upperIndex = Math.ceil(index);
+                const fraction = index - lowerIndex;
+                percentileValue = numbers[lowerIndex] + fraction * (numbers[upperIndex] - numbers[lowerIndex]);
+            }
+
+            // Exam-specific guidance
+            let guidance = '';
+            if (examType === 'jee') {
+                const totalScore = maths + physics + chemistry;
+                const jeePercentiles = {
+                    maths: calculateSubjectPercentile(maths, numbers),
+                    physics: calculateSubjectPercentile(physics, numbers),
+                    chemistry: calculateSubjectPercentile(chemistry, numbers)
+                };
+                guidance = `
+                    <div>Total Score: ${totalScore.toFixed(2)}</div>
+                    <div>Maths Percentile: ${jeePercentiles.maths.toFixed(2)}</div>
+                    <div>Physics Percentile: ${jeePercentiles.physics.toFixed(2)}</div>
+                    <div>Chemistry Percentile: ${jeePercentiles.chemistry.toFixed(2)}</div>
+                    <div>JEE Main Guidance: A percentile above 94 is typically required for JEE Advanced eligibility. For top NITs (CSE), aim for 99.4+ percentile. Your dataset percentile (${percentile}th) corresponds to a score of ${percentileValue.toFixed(2)}.</div>[](https://engineering.careers360.com/articles/how-much-percentile-required-for-jee-advanced)
+                `;
+            } else if (examType === 'neet') {
+                guidance = `
+                    <div>NEET Guidance: A percentile above 90 is competitive for government medical colleges. Your dataset percentile (${percentile}th) corresponds to a score of ${percentileValue.toFixed(2)}.</div>[](https://www.pw.live/iit-jee/exams/jee-main-cutoff-2025)
+                `;
+            } else if (examType === 'gate') {
+                guidance = `
+                    <div>GATE Guidance: A percentile above 99 is ideal for IIT M.Tech admissions or PSU jobs. Your dataset percentile (${percentile}th) corresponds to a score of ${percentileValue.toFixed(2)}.</div>[](https://www.pw.live/iit-jee/exams/what-percentage-is-required-for-iit)
+                `;
+            }
+
+            // Display result
+            resultDiv.innerHTML = `
+                <div>The ${percentile}th percentile is: ${percentileValue.toFixed(2)}</div>
+                ${guidance}
+            `;
+        }
+
+        // Helper function to calculate subject-wise percentile
+        function calculateSubjectPercentile(score, dataset) {
+            if (isNaN(score)) return 0;
+            const sortedDataset = [...dataset].sort((a, b) => a - b);
+            const countBelow = sortedDataset.filter(num => num <= score).length;
+            return (countBelow / dataset.length) * 100;
+        }
+
+        // Add event listener for Enter key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                calculatePercentile();
+            }
+        });
+    </script>
+</body>
+</html>

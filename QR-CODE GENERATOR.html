@@ -1,0 +1,219 @@
+<!-- Paste this in a Blogger post (HTML mode) or HTML widget -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://pl27141191.profitablecpmratenetwork.com/d3/ab/4b/d3ab4b09d03feca982585e31ef1d8e1e.js"></script>
+  <meta charset="UTF-8" />
+  <title>QR Code Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(to bottom, #e3f6ff, #f2fbff);
+      color: #111;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .qr-container {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 20px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      font-size: 22px;
+      color: #0077b6;
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    label {
+      font-size: 14px;
+      margin-top: 10px;
+      display: block;
+    }
+
+    input[type="text"], input[type="color"], input[type="number"], select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 5px;
+      border: none;
+      border-radius: 10px;
+      background: #ffffff;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    #qrFrame {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px auto;
+      padding: 10px;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 119, 182, 0.15);
+    }
+
+    .download-btn {
+      display: block;
+      width: 100%;
+      background: linear-gradient(to right, #00cfff, #0077b6);
+      border: none;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background: linear-gradient(to right, #0077b6, #00cfff);
+      transform: scale(1.02);
+    }
+
+    @media(max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .qr-container {
+        padding: 15px;
+      }
+
+      .download-btn {
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="qr-container">
+    <h2>QR CODE GENERATOR</h2>
+
+    <label for="urlInput">🔗 Enter URL</label>
+    <input type="text" id="urlInput" value="https://example.com" />
+
+    <label for="fgColor">🎨 Foreground Color</label>
+    <input type="color" id="fgColor" value="#0077b6" />
+
+    <label for="bgColor">🖼 Background Color</label>
+    <input type="color" id="bgColor" value="#ffffff" />
+
+    <label for="styleSelect">✨ QR Style</label>
+    <select id="styleSelect">
+      <option value="square">Square</option>
+      <option value="dots">Dots</option>
+      <option value="rounded">Rounded</option>
+      <option value="ai">AI Style</option>
+    </select>
+
+    <label for="sizeInput">📏 QR Size (px)</label>
+    <input type="number" id="sizeInput" value="250" min="100" max="600" />
+
+    <div id="qrFrame">
+      <div id="qrCanvas"></div>
+    </div>
+
+    <button class="download-btn" onclick="downloadQR()">⬇ Download QR Code</button>
+  </div>
+
+  <script>
+    let qrSize = parseInt(document.getElementById("sizeInput").value);
+    const qrCode = new QRCodeStyling({
+      width: qrSize,
+      height: qrSize,
+      data: document.getElementById("urlInput").value,
+      dotsOptions: {
+        color: "#0077b6",
+        type: "square"
+      },
+      backgroundOptions: {
+        color: "#ffffff"
+      }
+    });
+
+    qrCode.append(document.getElementById("qrCanvas"));
+
+    function updateQR() {
+      const style = document.getElementById("styleSelect").value;
+      const fgColor = document.getElementById("fgColor").value;
+      const bgColor = document.getElementById("bgColor").value;
+      const size = parseInt(document.getElementById("sizeInput").value);
+
+      let dotsOptions = { color: fgColor, type: "square" };
+      let backgroundOptions = { color: bgColor };
+
+      if (style === "dots") dotsOptions.type = "dots";
+      else if (style === "rounded") dotsOptions.type = "rounded";
+      else if (style === "ai") {
+        dotsOptions = {
+          color: fgColor,
+          type: "extra-rounded"
+        };
+        backgroundOptions = {
+          color: bgColor,
+          gradient: {
+            type: "radial",
+            rotation: 0,
+            colorStops: [
+              { offset: 0, color: bgColor },
+              { offset: 1, color: "#e0f7ff" }
+            ]
+          }
+        };
+      }
+
+      qrCode.update({
+        width: size,
+        height: size,
+        data: document.getElementById("urlInput").value,
+        dotsOptions,
+        backgroundOptions
+      });
+
+      const qrElement = document.querySelector("#qrCanvas svg");
+      if (qrElement && style === "ai") {
+        qrElement.style.filter = `drop-shadow(0 0 8px ${fgColor}) drop-shadow(0 0 12px ${fgColor})`;
+      } else if (qrElement) {
+        qrElement.style.filter = "none";
+      }
+    }
+
+    document.getElementById("urlInput").addEventListener("input", updateQR);
+    document.getElementById("fgColor").addEventListener("input", updateQR);
+    document.getElementById("bgColor").addEventListener("input", updateQR);
+    document.getElementById("styleSelect").addEventListener("change", updateQR);
+    document.getElementById("sizeInput").addEventListener("input", updateQR);
+
+    function downloadQR() {
+      qrCode.download({ name: "ai-qr-code", extension: "png" });
+    }
+
+    updateQR();
+  </script>
+</body>
+</html>

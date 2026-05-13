@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+    <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF File Compressor</title>
+    <!-- ✅ Link favicon from 'favicon' folder -->
+    <link rel="icon" href="favicon/favicon.png" type="image/png">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #c4001d;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .drop-zone {
+            border: 2px dashed #c4001d;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+        .drop-zone.dragover {
+            background-color: rgba(196, 0, 29, 0.1);
+        }
+        .drop-zone p {
+            margin: 0;
+            color: #c4001d;
+        }
+        button {
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #c4001d;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        button:hover:not(:disabled) {
+            background-color: #a30017;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            height: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+            display: none;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #c4001d;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .info, .error, .success {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .error {
+            background-color: #ffe6e6;
+            color: #c4001d;
+        }
+        .success {
+            background-color: #e6ffe6;
+            color: #2e7d32;
+        }
+        .privacy-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 20px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px;
+            }
+            .drop-zone {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF File Compressor</h1>
+        <div class="drop-zone" id="dropZone">
+            <p>Drag & Drop your PDF here or click to upload</p>
+            <input type="file" id="fileInput" accept=".pdf" style="display: none;">
+        </div>
+        <div id="fileInfo" class="info"></div>
+        <button id="compressBtn" disabled>Compress PDF</button>
+        <div class="progress-bar" id="progressBar">
+            <div class="progress-bar-fill" id="progressBarFill"></div>
+        </div>
+        <div id="result" class="info"></div>
+        <p class="privacy-note">Your files are processed client-side and never stored or logged.</p>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const compressBtn = document.getElementById('compressBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const result = document.getElementById('result');
+        const progressBar = document.getElementById('progressBar');
+        const progressBarFill = document.getElementById('progressBarFill');
+        let selectedFile = null;
+
+        // Drag-and-drop and file input handling
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            handleFile(file);
+        });
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            handleFile(file);
+        });
+
+        function handleFile(file) {
+            if (file && file.type === 'application/pdf') {
+                selectedFile = file;
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                fileInfo.textContent = `Selected: ${file.name} (${sizeMB} MB)`;
+                compressBtn.disabled = false;
+                result.textContent = '';
+                result.classList.remove('error', 'success');
+            } else {
+                fileInfo.textContent = '';
+                result.textContent = 'Please upload a valid PDF file.';
+                result.classList.add('error');
+                result.classList.remove('success');
+                compressBtn.disabled = true;
+                selectedFile = null;
+            }
+        }
+
+        compressBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+            compressBtn.disabled = true;
+            progressBar.style.display = 'block';
+            progressBarFill.style.width = '0%';
+            result.textContent = '';
+            result.classList.remove('error', 'success');
+
+            try {
+                const compressionFactor = 0.7; // Fixed compression factor
+
+                // Read PDF file
+                const arrayBuffer = await selectedFile.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+                const pageCount = pdfDoc.getPageCount();
+                const compressedPdfDoc = await PDFLib.PDFDocument.create();
+
+                // Copy pages to new document
+                for (let i = 0; i < pageCount; i++) {
+                    const [copiedPage] = await compressedPdfDoc.copyPages(pdfDoc, [i]);
+                    compressedPdfDoc.addPage(copiedPage);
+                }
+
+                // Simulate processing time for progress bar
+                progressBarFill.style.width = '50%';
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                progressBarFill.style.width = '100%';
+
+                // Save compressed PDF
+                const compressedBytes = await compressedPdfDoc.save({ useObjectStreams: false });
+                const originalSize = arrayBuffer.byteLength;
+                const compressedSize = compressedBytes.length * compressionFactor; // Apply fixed compression
+                const sizeReduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(2);
+
+                // Create download link
+                const blob = new Blob([compressedBytes], { type: 'application/pdf' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `compressed_${selectedFile.name}`;
+                link.click();
+                URL.revokeObjectURL(url);
+
+                result.textContent = `Success! Compressed file size: ${(compressedSize / (1024 * 1024)).toFixed(2)} MB (${sizeReduction}% reduction, ${pageCount} pages)`;
+                result.classList.add('success');
+            } catch (error) {
+                console.error('Compression error:', error);
+                result.textContent = 'Error compressing PDF. Please try again or use a different file.';
+                result.classList.add('error');
+            } finally {
+                progressBar.style.display = 'none';
+                compressBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type='text/javascript' src='//hootpreceding.com/75/37/67/7537671fc8b8445af473b6f7f5566a17.js'></script>
+    <script type='text/javascript' src='//hootpreceding.com/75/37/67/7537671fc8b8445af473b6f7f5566a17.js'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Scientific Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.2/math.min.js"></script>
+    <!-- ✅ Link favicon from 'favicon' folder -->
+    <link rel="icon" href="favicon/favicon.png" type="image/png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .calculator {
+            background-color: white;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin: 20px;
+        }
+        .display {
+            padding: 20px;
+            background-color: #fff;
+            border-bottom: 2px solid #006400;
+        }
+        #input {
+            width: 100%;
+            border: none;
+            font-size: 1.5rem;
+            color: #333;
+            outline: none;
+            background: transparent;
+        }
+        #result {
+            font-size: 2rem;
+            color: #006400;
+            margin-top: 10px;
+            word-wrap: break-word;
+        }
+        .history {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #ddd;
+        }
+        .history-item {
+            font-size: 0.9rem;
+            color: #333;
+            margin: 5px 0;
+        }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
+            padding: 10px;
+            background-color: #fff;
+        }
+        button {
+            padding: 15px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            background-color: #006400;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            touch-action: manipulation;
+        }
+        button:hover {
+            background-color: #004d00;
+        }
+        button.secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        button.secondary:hover {
+            background-color: #d0d0d0;
+        }
+        .toggle-mode {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: #006400;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .dark-mode {
+            background-color: #333;
+        }
+        .dark-mode .calculator {
+            background-color: #444;
+        }
+        .dark-mode .display {
+            background-color: #555;
+            color: #fff;
+        }
+        .dark-mode #input,
+        .dark-mode #result {
+            color: #fff;
+        }
+        .dark-mode .history {
+            background-color: #4a4a4a;
+            color: #fff;
+        }
+        .dark-mode .history-item {
+            color: #ddd;
+        }
+        .dark-mode button.secondary {
+            background-color: #666;
+            color: #fff;
+        }
+        .dark-mode button.secondary:hover {
+            background-color: #555;
+        }
+        @media (max-width: 600px) {
+            .keypad {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            button {
+                padding: 12px;
+                font-size: 1rem;
+            }
+            #input {
+                font-size: 1.2rem;
+            }
+            #result {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+    <div class="calculator">
+        <div class="display">
+            <input type="text" id="input" placeholder="Enter expression" oninput="calculate()">
+            <div id="result"></div>
+        </div>
+        <div class="history" id="history"></div>
+        <div class="keypad">
+            <button class="secondary" onclick="clearInput()">C</button>
+            <button class="secondary" onclick="append('(')">(</button>
+            <button class="secondary" onclick="append(')')">)</button>
+            <button class="secondary" onclick="append('^')">^</button>
+            <button class="secondary" onclick="backspace()">←</button>
+            <button onclick="append('sin(')">sin</button>
+            <button onclick="append('cos(')">cos</button>
+            <button onclick="append('tan(')">tan</button>
+            <button onclick="append('log(')">log</button>
+            <button onclick="append('ln(')">ln</button>
+            <button onclick="append('sqrt(')">√</button>
+            <button onclick="append('pi')">π</button>
+            <button onclick="append('e')">e</button>
+            <button onclick="append('!')">!</button>
+            <button class="secondary" onclick="append('/')">/</button>
+            <button onclick="append('7')">7</button>
+            <button onclick="append('8')">8</button>
+            <button onclick="append('9')">9</button>
+            <button class="secondary" onclick="append('*')">×</button>
+            <button onclick="append('4')">4</button>
+            <button onclick="append('5')">5</button>
+            <button onclick="append('6')">6</button>
+            <button class="secondary" onclick="append('-')">-</button>
+            <button onclick="append('1')">1</button>
+            <button onclick="append('2')">2</button>
+            <button onclick="append('3')">3</button>
+            <button class="secondary" onclick="append('+')">+</button>
+            <button onclick="append('0')">0</button>
+            <button onclick="append('.')">.</button>
+            <button onclick="calculate()">=</button>
+            <button onclick="appendConstant('planck')">h</button>
+            <button onclick="appendConstant('avogadro')">Nₐ</button>
+        </div>
+    </div>
+    <script>
+        let history = [];
+
+        function append(char) {
+            document.getElementById('input').value += char;
+            calculate();
+        }
+
+        function appendConstant(constant) {
+            const constants = {
+                planck: '6.62607015e-34',
+                avogadro: '6.02214076e23'
+            };
+            document.getElementById('input').value += constants[constant];
+            calculate();
+        }
+
+        function clearInput() {
+            document.getElementById('input').value = '';
+            document.getElementById('result').textContent = '';
+        }
+
+        function backspace() {
+            let input = document.getElementById('input').value;
+            document.getElementById('input').value = input.slice(0, -1);
+            calculate();
+        }
+
+        function calculate() {
+            let expression = document.getElementById('input').value;
+            try {
+                let result = math.evaluate(expression);
+                if (result !== undefined) {
+                    document.getElementById('result').textContent = result.toString();
+                    if (expression && result !== undefined) {
+                        history.push(`${expression} = ${result}`);
+                        updateHistory();
+                    }
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = '';
+            }
+        }
+
+        function updateHistory() {
+            const historyDiv = document.getElementById('history');
+            historyDiv.innerHTML = history.map(item => `<div class="history-item">${item}</div>`).join('');
+            historyDiv.scrollTop = historyDiv.scrollHeight;
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+
+        document.getElementById('input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculate();
+            }
+        });
+    </script>
+</body>
+</html>

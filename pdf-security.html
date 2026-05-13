@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+  <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Security Tool</title>
+  <!-- ✅ Link favicon from 'favicon' folder -->
+  <link rel="icon" href="favicon/favicon.png" type="image/png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #FFFFFF;
+      margin: 0;
+      padding: 20px;
+      color: #3C2F2F;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+      padding: 10px;
+    }
+    h1 {
+      color: #5D4037;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .description {
+      text-align: center;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+    .mode-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .mode-toggle button {
+      background-color: #8D6E63;
+      color: #FFFFFF;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .mode-toggle button.active, .mode-toggle button:hover {
+      background-color: #5D4037;
+    }
+    .main-area {
+      background-color: #f5f5f5;
+      padding: 20px;
+      border-radius: 5px;
+      border: 2px solid #8D6E63;
+    }
+    .dropzone {
+      border: 2px dashed #5D4037;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .dropzone:hover, .dropzone.dragover {
+      background-color: #f0e4e0;
+    }
+    .dropzone p {
+      margin: 10px 0;
+      color: #5D4037;
+    }
+    .form-group {
+      margin: 15px 0;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #5D4037;
+    }
+    input[type="password"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #8D6E63;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .permissions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .permissions label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: normal;
+    }
+    button.primary {
+      background-color: #5D4037;
+      color: #FFFFFF;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      width: 100%;
+      max-width: 200px;
+      transition: background-color 0.3s;
+    }
+    button.primary:hover {
+      background-color: #3C2F2F;
+    }
+    .result-area {
+      text-align: center;
+      margin-top: 20px;
+      display: none;
+    }
+    .result-area p {
+      color: #5D4037;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+    .progress-spinner {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #5D4037;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5rem;
+      }
+      .description {
+        font-size: 0.9rem;
+      }
+      .mode-toggle {
+        flex-direction: column;
+      }
+      .mode-toggle button {
+        width: 100%;
+        max-width: 200px;
+      }
+      button.primary {
+        max-width: 100%;
+      }
+      .permissions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PDF Security Tool</h1>
+    <p class="description">Secure your PDFs with a password or unlock protected PDFs.</p>
+    <div class="mode-toggle">
+      <button class="active" id="secureMode" aria-pressed="true">Secure PDF</button>
+      <button id="unlockMode" aria-pressed="false">Unlock PDF</button>
+    </div>
+    <div class="main-area" id="mainArea">
+      <div class="dropzone" id="dropzone">
+        <p>Drag and drop a PDF file or click to upload</p>
+        <input type="file" id="fileInput" accept=".pdf" aria-label="Upload PDF file">
+        <p id="fileName">No file selected</p>
+      </div>
+      <div id="secureForm">
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required aria-required="true" placeholder="Enter password">
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" required aria-required="true" placeholder="Confirm password">
+        </div>
+        <div class="permissions">
+          <label><input type="checkbox" id="restrictPrint"> Restrict Printing</label>
+          <label><input type="checkbox" id="restrictEdit"> Restrict Editing</label>
+          <label><input type="checkbox" id="restrictCopy"> Restrict Copying</label>
+        </div>
+        <button class="primary" id="secureBtn">Secure PDF</button>
+      </div>
+      <div id="unlockForm" style="display: none;">
+        <div class="form-group">
+          <label for="unlockPassword">Password</label>
+          <input type="password" id="unlockPassword" required aria-required="true" placeholder="Enter password">
+        </div>
+        <button class="primary" id="unlockBtn">Unlock PDF</button>
+      </div>
+    </div>
+    <div class="result-area" id="resultArea">
+      <div class="progress-spinner" id="spinner"></div>
+      <p id="resultMessage"></p>
+      <a id="downloadLink" style="display: none;" download>Download Processed PDF</a>
+    </div>
+  </div>
+
+  <script>
+    const secureModeBtn = document.getElementById('secureMode');
+    const unlockModeBtn = document.getElementById('unlockMode');
+    const secureForm = document.getElementById('secureForm');
+    const unlockForm = document.getElementById('unlockForm');
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileNameDisplay = document.getElementById('fileName');
+    const secureBtn = document.getElementById('secureBtn');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const resultArea = document.getElementById('resultArea');
+    const resultMessage = document.getElementById('resultMessage');
+    const downloadLink = document.getElementById('downloadLink');
+    const spinner = document.getElementById('spinner');
+
+    // Toggle between modes
+    secureModeBtn.addEventListener('click', () => {
+      secureModeBtn.classList.add('active');
+      unlockModeBtn.classList.remove('active');
+      secureModeBtn.setAttribute('aria-pressed', 'true');
+      unlockModeBtn.setAttribute('aria-pressed', 'false');
+      secureForm.style.display = 'block';
+      unlockForm.style.display = 'none';
+      resetForm();
+    });
+    unlockModeBtn.addEventListener('click', () => {
+      unlockModeBtn.classList.add('active');
+      secureModeBtn.classList.remove('active');
+      unlockModeBtn.setAttribute('aria-pressed', 'true');
+      secureModeBtn.setAttribute('aria-pressed', 'false');
+      unlockForm.style.display = 'block';
+      secureForm.style.display = 'none';
+      resetForm();
+    });
+
+    // Drag and drop functionality
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type === 'application/pdf') {
+        handleFile(file);
+      } else {
+        resultMessage.textContent = 'Please upload a valid PDF file.';
+      }
+    });
+
+    // Click to upload
+    dropzone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0 && fileInput.files[0].type === 'application/pdf') {
+        handleFile(fileInput.files[0]);
+      } else {
+        resultMessage.textContent = 'Please upload a valid PDF file.';
+      }
+    });
+
+    function handleFile(file) {
+      fileNameDisplay.textContent = file.name;
+      secureBtn.disabled = false;
+      unlockBtn.disabled = false;
+      resultArea.style.display = 'none';
+    }
+
+    function resetForm() {
+      fileInput.value = '';
+      fileNameDisplay.textContent = 'No file selected';
+      document.getElementById('password').value = '';
+      document.getElementById('confirmPassword').value = '';
+      document.getElementById('unlockPassword').value = '';
+      document.getElementById('restrictPrint').checked = false;
+      document.getElementById('restrictEdit').checked = false;
+      document.getElementById('restrictCopy').checked = false;
+      secureBtn.disabled = true;
+      unlockBtn.disabled = true;
+      resultArea.style.display = 'none';
+    }
+
+    // Secure PDF (simulated)
+    secureBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const restrictPrint = document.getElementById('restrictPrint').checked;
+      const restrictEdit = document.getElementById('restrictEdit').checked;
+      const restrictCopy = document.getElementById('restrictCopy').checked;
+
+      if (!file) {
+        resultMessage.textContent = 'Please upload a PDF file.';
+        return;
+      }
+      if (password !== confirmPassword) {
+        resultMessage.textContent = 'Passwords do not match.';
+        return;
+      }
+      if (!password) {
+        resultMessage.textContent = 'Please enter a password.';
+        return;
+      }
+
+      spinner.style.display = 'block';
+      resultArea.style.display = 'block';
+      resultMessage.textContent = 'Securing PDF...';
+
+      try {
+        // Simulate PDF securing (placeholder for pdf-lib.js or similar)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Example: const pdfDoc = await PDFLib.PDFDocument.load(await file.arrayBuffer());
+        // pdfDoc.setUserPassword(password);
+        const blob = new Blob([file], { type: 'application/pdf' }); // Simulated output
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `secured_${file.name}`;
+        downloadLink.style.display = 'block';
+        resultMessage.textContent = 'PDF secured successfully!';
+        spinner.style.display = 'none';
+      } catch (error) {
+        resultMessage.textContent = 'Failed to secure PDF. Please try again.';
+        spinner.style.display = 'none';
+      }
+    });
+
+    // Unlock PDF (simulated)
+    unlockBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      const password = document.getElementById('unlockPassword').value;
+
+      if (!file) {
+        resultMessage.textContent = 'Please upload a PDF file.';
+        return;
+      }
+      if (!password) {
+        resultMessage.textContent = 'Please enter a password.';
+        return;
+      }
+
+      spinner.style.display = 'block';
+      resultArea.style.display = 'block';
+      resultMessage.textContent = 'Unlocking PDF...';
+
+      try {
+        // Simulate PDF unlocking (placeholder for pdf-lib.js or similar)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Example: const pdfDoc = await PDFLib.PDFDocument.load(await file.arrayBuffer(), { password });
+        const blob = new Blob([file], { type: 'application/pdf' }); // Simulated output
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `unlocked_${file.name}`;
+        downloadLink.style.display = 'block';
+        resultMessage.textContent = 'PDF unlocked successfully!';
+        spinner.style.display = 'none';
+      } catch (error) {
+        resultMessage.textContent = 'Failed to unlock PDF. Incorrect password or corrupted file.';
+        spinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://pl27141191.profitablecpmratenetwork.com/d3/ab/4b/d3ab4b09d03feca982585e31ef1d8e1e.js"></script>
+<meta name="google-adsense-account" content="ca-pub-6549212371072693">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebGadget - Your Daily Tools, All in One Place</title>
+<!-- ✅ Link favicon from 'favicon' folder -->
+<link rel="icon" href="favicon/favicon.png" type="image/png">    
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+<style>
+        :root {
+            --primary-blue: #2563EB;
+            --light-blue: #60A5FA;
+            --gradient-blue: linear-gradient(135deg, #3B82F6, #1E40AF);
+        }
+        .sticky { position: sticky; top: 0; z-index: 50; }
+        .nav-link { transition: color 0.3s ease, opacity 0.3s ease; }
+        .nav-link:hover { color: var(--light-blue); opacity: 0.8; }
+        .tool-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .tool-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
+        .cta-button { transition: background-color 0.3s ease, transform 0.3s ease; }
+        .cta-button:hover { transform: scale(1.05); background-color: var(--light-blue); }
+        .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .search-container { transition: all 0.3s ease; }
+        .search-container:focus-within { transform: scale(1.02); }
+        .dark-mode { background-color: #1F2937; color: #F9FAFB; }
+        .dark-mode .tool-card { background-color: #374151; }
+        .dark-mode .bg-gray-100 { background-color: #111827; }
+        
+        /* 🎨 ELEGANT DEEP BLUE HEADER STYLES */
+        .logo-img {
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            transition: transform 0.3s ease, filter 0.3s ease;
+            background: white;
+            border-radius: 12px;
+            padding: 2px;
+        }
+        .logo-img:hover {
+            transform: rotate(-5deg) scale(1.08);
+            filter: drop-shadow(0 6px 14px rgba(0,0,0,0.25));
+        }
+        .brand-text {
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            /* Fallback solid deep navy */
+            color: #0A1F44;
+            /* Gradient on top for modern browsers */
+            background: linear-gradient(135deg, #0A1F44 0%, #1E3A8A 40%, #2563EB 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            /* Subtle drop shadow for readability */
+            filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+            transition: all 0.3s ease;
+        }
+        .brand-text:hover {
+            filter: drop-shadow(0 2px 4px rgba(30, 58, 138, 0.3));
+        }
+        .tagline {
+            color: #4B5563;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .dark-mode .tagline {
+            color: #D1D5DB;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans transition-colors duration-300">
+    <!-- Header -->
+    <header class="bg-white shadow sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- ✨ LOGO + ELEGANT TEXT -->
+            <div class="flex items-center space-x-3">
+                <!-- Logo image with fallback inline SVG if missing -->
+                <img src="favicon/favicon.png" alt="WebGadget Logo" 
+                     class="h-14 w-14 logo-img" 
+                     onerror="this.onerror=null; this.outerHTML='<svg class=\'h-14 w-14 logo-img\' viewBox=\'0 0 100 100\' fill=\'none\'><rect width=\'100\' height=\'100\' rx=\'20\' fill=\'url(#logoGrad)\'/><path d=\'M25 40h50v20H25z\' fill=\'white\'/><circle cx=\'50\' cy=\'30\' r=\'10\' fill=\'white\'/><path d=\'M38 65h24l-4 15H42z\' fill=\'white\'/><defs><linearGradient id=\'logoGrad\' x1=\'0%\' y1=\'0%\' x2=\'100%\' y2=\'100%\'><stop offset=\'0%\' style=\'stop-color:#0A1F44\'/><stop offset=\'100%\' style=\'stop-color:#2563EB\'/></linearGradient></defs></svg>';">
+                <div class="flex flex-col">
+                    <span class="text-2xl md:text-3xl brand-text">
+                        WebGadget
+                    </span>
+                    <span class="tagline">Your Daily Tools</span>
+                </div>
+            </div>
+            <!-- navigation unchanged -->
+            <nav class="hidden md:flex space-x-6">
+                <a href="#home" class="nav-link text-gray-600 hover:text-blue-500">Home</a>
+                <a href="#tools" class="nav-link text-gray-600 hover:text-blue-500">Tools</a>
+                <a href="#contact" class="nav-link text-gray-600 hover:text-blue-500">Contact</a>
+            </nav>
+            <div class="md:hidden">
+                <button id="menu-toggle" class="text-gray-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+            <button id="theme-toggle" class="ml-4 text-gray-600 focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow">
+            <a href="#home" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">Home</a>
+            <a href="#tools" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">Tools</a>
+            <a href="#contact" class="block px-4 py-2 text-gray-600 hover:bg-gray-100">Contact</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="py-20 bg-gradient-to-r from-blue-500 to-blue-800 text-white text-center">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4 fade-in">Your Daily Tools, All in One Place</h2>
+            <p class="text-lg md:text-xl mb-6 fade-in">Convert, calculate, compress, and simplify your everyday tasks — fast and free.</p>
+            <a href="#tools" class="cta-button inline-block bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-100">Explore Tools</a>
+            <div class="mt-8 flex justify-center space-x-4 fade-in">
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4ざ12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                </div>
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path d="M17 3H3a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zM8 13H6V7h2v6zm3 0H9V7h2v6zm3 0h-2V7h2v6z"></path></svg>
+                </div>
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a 2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3 2v6h2V7H5zm4 0v6h2V7H9zm4 0v6h2V7h-2z"></path></svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Bar -->
+    <section class="py-8 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="search-container max-w-2xl mx-auto relative">
+                <input id="search-input" type="text" placeholder="Search a tool..." class="w-full p-4 pr-12 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <svg class="absolute right-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tool Categories (unchanged) -->
+    <section id="tools" class="py-12 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <!-- Image Tools -->
+            <div class="mb-12 fade-in">
+                <h3 class="text-2xl font-bold mb-2">🖼 Image Tools</h3>
+                <p class="text-gray-600 mb-6">Edit and optimize your images with ease.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Image Converter</h4>
+                        <p class="text-gray-600">Convert images between formats.</p>
+                        <a href="image-converter.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                     <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Image to Pdf Converter</h4>
+                        <p class="text-gray-600">Convert Image to Pdf</p>
+                        <a href="Pdf Converter.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Image Compressor</h4>
+                        <p class="text-gray-600">Reduce image file size.</p>
+                        <a href="image-compressor.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Resizer</h4>
+                        <p class="text-gray-600">Adjust image dimensions.</p>
+                        <a href="image-resizer.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Image to Url Converter</h4>
+                        <p class="text-gray-600">Extract Url from images.</p>
+                        <a href="image2url-converter.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Image Background Remover </h4>
+                        <p class="text-gray-600">Remove the image background.</p>
+                        <a href="image-bgremove.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Cropper</h4>
+                        <p class="text-gray-600">Crop images to desired size.</p>
+                        <a href="image-cropper.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Passportsize image generator</h4>
+                        <p class="text-gray-600">Convert the image into passport size</p>
+                        <a href="img-passport-size.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"></path></svg>
+                        <h4 class="text-lg font-semibold">Rotator</h4>
+                        <p class="text-gray-600">Rotate images as needed.</p>
+                        <a href="image-rotator-converter.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Tools -->
+            <div class="mb-12 fade-in">
+                <h3 class="text-2xl font-bold mb-2">📄 Document Tools</h3>
+                <p class="text-gray-600 mb-6">Manage and convert your documents efficiently.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6zm2 2h8v2H6V8zm0 3h8v2H6v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">PDF to Word/PDF</h4>
+                        <p class="text-gray-600">Convert PDFs to Word or other formats.</p>
+                        <a href="pdf-to-word-converter.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6zm2 2h8v2H6V8zm0 3h8v2H6v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Compressor</h4>
+                        <p class="text-gray-600">Reduce PDF file size.</p>
+                        <a href="pdf-file-compressor.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6zm2 2h8v2H6V8zm0 3h8v2H6v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Merger/Splitter</h4>
+                        <p class="text-gray-600">Merge or split PDF files.</p>
+                        <a href="pdf-merger-splitter.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6zm2 2h8v2H6V8zm0 3h8v2H6v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Converter</h4>
+                        <p class="text-gray-600">Convert documents to various formats.</p>
+                        <a href="various-file.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6zm2 2h8v2H6V8zm0 3h8v2H6v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Lock/Unlock</h4>
+                        <p class="text-gray-600">Secure or unlock PDFs.</p>
+                        <a href="pdf-security.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6zm2 2h8v2H6V8zm0 3h8v2H6v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">eSign</h4>
+                        <p class="text-gray-600">Digitally sign your documents.</p>
+                        <a href="esign-document.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                     </div>
+                        <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6zm2 2h8v2H6V8zm0 3h8v2H6v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">QR code Generator</h4>
+                        <p class="text-gray-600">Secure your link to QR</p>
+                        <a href="QR-CODE GENERATOR.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculator Tools -->
+            <div class="mb-12 fade-in">
+                <h3 class="text-2xl font-bold mb-2">🧮 Calculator Tools</h3>
+                <p class="text-gray-600 mb-6">Perform calculations for various needs.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm0 2h8v12H6V4zm2 2h4v2H8V6zm0 3h4v2H8V9zm0 3h4v2H8v-2zm-2 3h2v2H6v-2zm6 0h2v2h-2v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Scientific</h4>
+                        <p class="text-gray-600">Advanced scientific calculations.</p>
+                        <a href="scientific-calculator.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm0 2h8v12H6V4zm2 2h4v2H8V6zm0 3h4v2H8V9zm0 3h4v2H8v-2zm-2 3h2v2H6v-2zm6 0h2v2h-2v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Age</h4>
+                        <p class="text-gray-600">Calculate age from birthdate.</p>
+                        <a href="age-calculator.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm0 2h8v12H6V4zm2 2h4v2H8V6zm0 3h4v2H8V9zm0 3h4v2H8v-2zm-2 3h2v2H6v-2zm6 0h2v2h-2v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">BMI</h4>
+                        <p class="text-gray-600">Calculate Body Mass Index.</p>
+                        <a href="bmi-calculator.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm0 2h8v12H6V4zm2 2h4v2H8V6zm0 3h4v2H8V9zm0 3h4v2H8v-2zm-2 3h2v2H6v-2zm6 0h2v2h-2v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Loan EMI</h4>
+                        <p class="text-gray-600">Calculate loan EMI payments.</p>
+                        <a href="loan-emi-calculator.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm0 2h8v12H6V4zm2 2h4v2H8V6zm0 3h4v2H8V9zm0 3h4v2H8v-2zm-2 3h2v2H6v-2zm6 0h2v2h-2v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">GST</h4>
+                        <p class="text-gray-600">Calculate GST amounts.</p>
+                        <a href="gst-calculator.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm0 2h8v12H6V4zm2 2h4v2H8V6zm0 3h4v2H8V9zm0 3h4v2H8v-2zm-2 3h2v2H6v-2zm6 0h2v2h-2v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Currency</h4>
+                        <p class="text-gray-600">Convert between currencies.</p>
+                        <a href="currency-converter.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                    <div class="tool-card bg-white p-6 rounded-lg shadow">
+                        <svg class="w-10 h-10 text-blue-500 mb-4" fill="currentColor" viewBox="0 0 20 20"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm0 2h8v12H6V4zm2 2h4v2H8V6zm0 3h4v2H8V9zm0 3h4v2H8v-2zm-2 3h2v2H6v-2zm6 0h2v2h-2v-2z"></path></svg>
+                        <h4 class="text-lg font-semibold">Percentile Calculator</h4>
+                        <p class="text-gray-600">Calculate percentiles for data.</p>
+                        <a href="percentile-calculator.html" class="cta-button inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4">Use Tool</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact" class="bg-gray-800 text-white py-8 fade-in">
+        <div class="container mx-auto px-4 text-center">
+            <h3 class="text-xl font-bold mb-2">WebGadget</h3>
+            <p class="text-gray-400 mb-4">Simplifying your digital life.</p>
+            <p class="mb-4">Contact: <a href="mailto:technofuturepreneur@gmail.com" class="hover:text-blue-400">technofuturepreneur@gmail.com</a></p>
+            <div class="flex justify-center space-x-4">
+                <a href="About-us.html" class="text-gray-400 hover:text-blue-400">About-Us</a>
+                <a href="Privacy-policy.html" class="text-gray-400 hover:text-blue-400">Privacy-policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('menu-toggle').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Dark Mode Toggle
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+
+        // Scroll-based Animations
+        const fadeIns = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        fadeIns.forEach(element => observer.observe(element));
+
+        // Live Search Filter
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const toolCards = document.querySelectorAll('.tool-card');
+            toolCards.forEach(card => {
+                const title = card.querySelector('h4').textContent.toLowerCase();
+                card.style.display = title.includes(query) ? 'block' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

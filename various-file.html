@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+  <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Format Converter</title>
+  <!-- ✅ Link favicon from 'favicon' folder -->
+  <link rel="icon" href="favicon/favicon.png" type="image/png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+      padding: 20px;
+    }
+    h1 {
+      color: #8B4513;
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .upload-area {
+      border: 2px dashed #8B4513;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .upload-area:hover, .upload-area.dragover {
+      background-color: #f5e8d0;
+    }
+    .upload-area p {
+      margin: 10px 0;
+      color: #8B4513;
+    }
+    .format-selection {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    select {
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid #8B4513;
+      border-radius: 5px;
+      background-color: #fff;
+      color: #333;
+      width: 100%;
+      max-width: 200px;
+    }
+    button {
+      background-color: #8B4513;
+      color: #fff;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      width: 100%;
+      max-width: 200px;
+    }
+    button:hover {
+      background-color: #6b340f;
+    }
+    .result-area {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .result-area p {
+      color: #8B4513;
+      font-size: 1.1rem;
+    }
+    .progress-spinner {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #8B4513;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 10px;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      select, button {
+        max-width: 100%;
+      }
+      .format-selection {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Document Format Converter</h1>
+    <div class="upload-area" id="uploadArea">
+      <p>Drag and drop a file here or click to upload</p>
+      <input type="file" id="fileInput" accept=".doc,.docx,.pdf,.txt,.rtf,.odt" style="display: none;">
+      <p id="fileName">No file selected</p>
+    </div>
+    <div class="format-selection">
+      <select id="fromFormat">
+        <option value="">Select Source Format</option>
+        <option value="txt">TXT</option>
+        <option value="doc">DOC</option>
+        <option value="docx">DOCX</option>
+        <option value="pdf">PDF</option>
+        <option value="rtf">RTF</option>
+        <option value="odt">ODT</option>
+      </select>
+      <select id="toFormat">
+        <option value="">Select Target Format</option>
+        <option value="txt">TXT</option>
+        <option value="docx">DOCX</option>
+        <option value="pdf">PDF</option>
+      </select>
+    </div>
+    <button id="convertBtn" disabled>Convert</button>
+    <div class="result-area">
+      <div class="progress-spinner" id="spinner"></div>
+      <p id="resultMessage"></p>
+      <a id="downloadLink" style="display: none;" download>Download Converted File</a>
+    </div>
+  </div>
+
+  <script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const fileNameDisplay = document.getElementById('fileName');
+    const fromFormat = document.getElementById('fromFormat');
+    const toFormat = document.getElementById('toFormat');
+    const convertBtn = document.getElementById('convertBtn');
+    const resultMessage = document.getElementById('resultMessage');
+    const downloadLink = document.getElementById('downloadLink');
+    const spinner = document.getElementById('spinner');
+
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      handleFile(file);
+    });
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        handleFile(fileInput.files[0]);
+      }
+    });
+
+    // Enable convert button when inputs are valid
+    fromFormat.addEventListener('change', checkInputs);
+    toFormat.addEventListener('change', checkInputs);
+
+    function checkInputs() {
+      convertBtn.disabled = !fileInput.files[0] || !fromFormat.value || !toFormat.value;
+    }
+
+    function handleFile(file) {
+      fileNameDisplay.textContent = file.name;
+      checkInputs();
+    }
+
+    // Conversion logic (client-side for TXT, placeholder for others)
+    convertBtn.addEventListener('click', async () => {
+      const file = fileInput.files[0];
+      const source = fromFormat.value;
+      const target = toFormat.value;
+
+      if (!file || !source || !target) {
+        resultMessage.textContent = 'Please select a file and formats.';
+        return;
+      }
+
+      if (source === target) {
+        resultMessage.textContent = 'Source and target formats cannot be the same.';
+        return;
+      }
+
+      spinner.style.display = 'block';
+      resultMessage.textContent = 'Converting...';
+      downloadLink.style.display = 'none';
+
+      try {
+        if (source === 'txt' && target === 'txt') {
+          // Client-side TXT handling (example)
+          const reader = new FileReader();
+          reader.onload = () => {
+            const content = reader.result;
+            const blob = new Blob([content], { type: 'text/plain' });
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = `converted_${file.name}`;
+            downloadLink.style.display = 'block';
+            resultMessage.textContent = 'Conversion successful!';
+            spinner.style.display = 'none';
+          };
+          reader.readAsText(file);
+        } else {
+          // Placeholder for backend API call for complex formats
+          // Example: const response = await fetch('/api/convert', { method: 'POST', body: formData });
+          await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+          resultMessage.textContent = `Conversion from ${source} to ${target} requires backend processing.`;
+          spinner.style.display = 'none';
+        }
+      } catch (error) {
+        resultMessage.textContent = 'Conversion failed. Please try again.';
+        spinner.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

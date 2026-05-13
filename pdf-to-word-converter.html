@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+    <script type='text/javascript' src='//hootpreceding.com/e8/57/15/e85715ce383e5db16c256343461622a7.js'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Word Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <!-- ✅ Link favicon from 'favicon' folder -->
+    <link rel="icon" href="favicon/favicon.png" type="image/png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #00bfff;
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .upload-area {
+            border: 2px dashed #00bfff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .upload-area:hover {
+            background-color: #e6f7ff;
+        }
+        .upload-area.dragover {
+            background-color: #d0efff;
+        }
+        #file-input {
+            display: none;
+        }
+        #preview {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #00bfff;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        #convert-btn {
+            background-color: #00bfff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            font-size: 16px;
+        }
+        #convert-btn:hover {
+            background-color: #0099cc;
+        }
+        #convert-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #status {
+            text-align: center;
+            margin-top: 10px;
+            color: #00bfff;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            .upload-area {
+                padding: 15px;
+            }
+            #convert-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF to Word Converter</h1>
+        <div class="upload-area" id="upload-area">
+            <p>Drag & Drop your PDF here or click to select</p>
+            <input type="file" id="file-input" accept="application/pdf">
+        </div>
+        <canvas id="preview"></canvas>
+        <button id="convert-btn" disabled>Convert to Word</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const previewCanvas = document.getElementById('preview');
+        const convertBtn = document.getElementById('convert-btn');
+        const status = document.getElementById('status');
+        let pdfFile = null;
+
+        // Drag and drop handling
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            pdfFile = e.dataTransfer.files[0];
+            handleFile(pdfFile);
+        });
+
+        // File input handling
+        fileInput.addEventListener('change', (e) => {
+            pdfFile = e.target.files[0];
+            handleFile(pdfFile);
+        });
+
+        // Handle uploaded file
+        async function handleFile(file) {
+            if (file && file.type === 'application/pdf') {
+                status.textContent = 'Loading PDF...';
+                convertBtn.disabled = true;
+                await previewPDF(file);
+                convertBtn.disabled = false;
+                status.textContent = 'PDF loaded. Ready to convert!';
+            } else {
+                status.textContent = 'Please upload a valid PDF file.';
+                previewCanvas.style.display = 'none';
+                convertBtn.disabled = true;
+            }
+        }
+
+        // Preview PDF using pdf.js
+        async function previewPDF(file) {
+            const url = URL.createObjectURL(file);
+            const pdf = await pdfjsLib.getDocument(url).promise;
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 1.0 });
+            const context = previewCanvas.getContext('2d');
+
+            // Adjust canvas size for responsiveness
+            const canvasWidth = Math.min(760, window.innerWidth - 40);
+            const scale = canvasWidth / viewport.width;
+            previewCanvas.width = canvasWidth;
+            previewCanvas.height = viewport.height * scale;
+            previewCanvas.style.display = 'block';
+
+            await page.render({
+                canvasContext: context,
+                viewport: page.getViewport({ scale })
+            }).promise;
+            URL.revokeObjectURL(url);
+        }
+
+        // Simulate PDF to Word conversion
+        convertBtn.addEventListener('click', async () => {
+            if (!pdfFile) return;
+
+            status.textContent = 'Converting to Word...';
+            convertBtn.disabled = true;
+
+            // Simulate text extraction (in real-world, use server-side processing)
+            const pdf = await pdfjsLib.getDocument(URL.createObjectURL(pdfFile)).promise;
+            let text = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                text += content.items.map(item => item.str).join(' ') + '\n';
+            }
+
+            // Create basic DOCX using JSZip
+            const zip = new JSZip();
+            zip.file('[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+    <Default Extension="xml" ContentType="application/xml"/>
+    <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+    <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+</Types>`);
+
+            zip.file('_rels/.rels', `<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+    <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`);
+
+            zip.file('word/document.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+    <w:body>
+        <w:p>
+            <w:r>
+                <w:t>${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</w:t>
+            </w:r>
+        </w:p>
+    </w:body>
+</w:document>`);
+
+            // Generate and download DOCX
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'converted.docx';
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            status.textContent = 'Conversion complete! File downloaded.';
+            convertBtn.disabled = false;
+        });
+
+        // Handle window resize for responsive canvas
+        window.addEventListener('resize', () => {
+            if (pdfFile) handleFile(pdfFile);
+        });
+    </script>
+</body>
+</html>
