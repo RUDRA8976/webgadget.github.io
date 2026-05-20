@@ -4,418 +4,622 @@
   <link rel="icon" type="image/png" href="favicon.logo.png"> 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>image-size-optimizer</title>
-
+  <title>Image Resizer – KB</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:"Poppins",sans-serif;
+    :root {
+      --bg: #0d0d0f;
+      --surface: #16171b;
+      --surface2: #1e2028;
+      --border: #2a2c35;
+      --accent: #4ade80;
+      --accent2: #22d3ee;
+      --accent-dim: rgba(74,222,128,0.10);
+      --text: #f0f0f2;
+      --muted: #7b7f8e;
+      --danger: #f87171;
+      --success: #4ade80;
+      --radius: 16px;
     }
 
-    body{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:linear-gradient(135deg,#f5f7fa,#dfe9f3);
-      padding:20px;
+    html, body {
+      margin: 0; padding: 0;
+      overflow-x: hidden;
+      width: 100%;
     }
 
-    .container{
-      width:100%;
-      max-width:540px;
-      background:#fff;
-      padding:30px;
-      border-radius:24px;
-      box-shadow:0 20px 50px rgba(0,0,0,0.12);
+    *, *::before, *::after {
+      box-sizing: border-box;
     }
 
-    h1{
-      text-align:center;
-      color:#111827;
-      margin-bottom:10px;
-      font-size:30px;
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 30px 16px;
     }
 
-    .subtitle{
-      text-align:center;
-      color:#6b7280;
-      margin-bottom:25px;
-      font-size:14px;
+    .card {
+      width: 100%;
+      max-width: 500px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px 28px;
+      /* Removed huge box-shadow spread that caused overflow */
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
     }
 
-    .upload-box{
-      border:2px dashed #6366f1;
-      border-radius:18px;
-      background:#f8f9ff;
-      padding:35px 20px;
-      text-align:center;
-      cursor:pointer;
-      transition:0.3s;
-      margin-bottom:20px;
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), transparent);
     }
 
-    .upload-box:hover{
-      background:#eef2ff;
-      transform:translateY(-2px);
+    /* ── Header ── */
+    .header { text-align: center; margin-bottom: 26px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(74,222,128,0.22);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 13px;
+      border-radius: 100px;
+      margin-bottom: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
-    .upload-box input{
-      display:none;
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
     }
 
-    .upload-icon{
-      font-size:42px;
-      margin-bottom:10px;
+    @keyframes pulse {
+      0%,100%{ opacity:1; transform:scale(1); }
+      50%{ opacity:0.4; transform:scale(0.7); }
     }
 
-    .upload-text{
-      font-size:15px;
-      font-weight:600;
-      color:#374151;
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: var(--text);
+      margin-bottom: 6px;
     }
 
-    .preview{
-      display:none;
-      margin:20px 0;
-      text-align:center;
+    h1 span { color: var(--accent); }
+
+    .sub {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
     }
 
-    .preview img{
-      max-width:100%;
-      max-height:260px;
-      border-radius:16px;
-      box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    /* ── Upload zone ── */
+    .upload-zone {
+      display: block;
+      width: 100%;
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      background: var(--surface2);
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 18px;
     }
 
-    .info{
-      display:none;
-      background:#f3f4f6;
-      border-radius:14px;
-      padding:14px;
-      margin-bottom:20px;
-      font-size:14px;
-      line-height:1.8;
-      color:#374151;
+    .upload-zone:hover, .upload-zone.drag {
+      border-color: var(--accent);
+      background: rgba(74,222,128,0.04);
     }
 
-    .form-group{
-      margin-bottom:18px;
+    .upload-zone input { display: none; }
+
+    .upload-icon {
+      width: 50px; height: 50px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(74,222,128,0.2);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 22px;
     }
 
-    label{
-      display:block;
-      margin-bottom:8px;
-      font-size:14px;
-      font-weight:600;
-      color:#374151;
+    .upload-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
     }
 
-    .size-input{
-      display:flex;
-      gap:10px;
+    .upload-hint {
+      font-size: 12px;
+      color: var(--muted);
     }
 
-    input[type="number"]{
-      flex:1;
-      padding:14px;
-      border-radius:14px;
-      border:1px solid #d1d5db;
-      outline:none;
-      font-size:15px;
+    .upload-hint span { color: var(--accent); font-weight: 600; }
+
+    /* ── Preview ── */
+    .preview-wrap {
+      display: none;
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+      background: #000;
+      max-height: 220px;
     }
 
-    select{
-      width:110px;
-      border-radius:14px;
-      border:1px solid #d1d5db;
-      padding:14px;
-      font-size:15px;
-      outline:none;
-      cursor:pointer;
-      background:#fff;
+    .preview-wrap img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      display: block;
     }
 
-    input[type="number"]:focus,
-    select:focus{
-      border-color:#6366f1;
-      box-shadow:0 0 0 4px rgba(99,102,241,0.15);
+    /* ── Info bar ── */
+    .info-bar {
+      display: none;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
     }
 
-    .buttons{
-      display:grid;
-      gap:12px;
+    .info-bar.show { display: grid; }
+
+    .info-item { text-align: center; }
+
+    .info-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
     }
 
-    button,
-    .download-btn{
-      border:none;
-      padding:15px;
-      border-radius:14px;
-      font-size:15px;
-      font-weight:600;
-      cursor:pointer;
-      transition:0.3s;
-      text-align:center;
-      text-decoration:none;
+    .info-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
     }
 
-    button{
-      background:linear-gradient(135deg,#6366f1,#8b5cf6);
-      color:#fff;
+    .info-value.green { color: var(--accent); }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
     }
 
-    button:hover{
-      transform:translateY(-2px);
-      box-shadow:0 10px 22px rgba(99,102,241,0.35);
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
 
-    .download-btn{
-      display:none;
-      background:#111827;
-      color:#fff;
+    /* ── Form ── */
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
     }
 
-    .download-btn:hover{
-      background:#000;
-      transform:translateY(-2px);
+    .size-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      width: 100%;
     }
 
-    .message{
-      margin-top:15px;
-      text-align:center;
-      font-size:14px;
-      font-weight:600;
+    .size-row input[type="number"] {
+      flex: 1;
+      min-width: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 14px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -moz-appearance: textfield;
     }
 
-    canvas{
-      display:none;
+    .size-row input[type="number"]::-webkit-inner-spin-button,
+    .size-row input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    .size-row input[type="number"]::placeholder { color: var(--muted); font-weight: 400; }
+
+    .size-row input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(74,222,128,0.12);
     }
 
-    @media(max-width:480px){
-      .container{
-        padding:22px;
-      }
+    .unit-toggle {
+      display: flex;
+      flex-shrink: 0;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
 
-      h1{
-        font-size:24px;
-      }
+    .unit-btn {
+      padding: 13px 20px;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
 
-      .size-input{
-        flex-direction:column;
-      }
+    .unit-btn.active {
+      background: var(--accent);
+      color: #0d0d0f;
+    }
 
-      select{
-        width:100%;
+    /* ── Buttons ── */
+    .btn-resize {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: #0d0d0f;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .btn-resize:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-resize:active { transform: translateY(0); }
+    .btn-resize:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,0.25);
+      border-top-color: #0d0d0f;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .btn-download {
+      display: none;
+      width: 100%;
+      padding: 13px;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: background 0.2s, border-color 0.2s;
+      margin-bottom: 12px;
+    }
+
+    .btn-download:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: var(--accent2);
+    }
+
+    .btn-download.show { display: block; }
+
+    /* ── Message ── */
+    .msg {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .msg.success { background: rgba(74,222,128,0.1);  color: var(--success); display: block; }
+    .msg.error   { background: rgba(248,113,113,0.1); color: var(--danger);  display: block; }
+    .msg.warn    { background: rgba(251,191,36,0.1);  color: #fbbf24;        display: block; }
+
+    canvas { display: none; }
+
+    /* ── Mobile ── */
+    @media (max-width: 480px) {
+      .card { padding: 24px 18px; border-radius: 20px; }
+      h1 { font-size: 22px; }
+      .unit-btn { padding: 13px 16px; }
+      .info-bar { grid-template-columns: 1fr 1fr; }
+      .info-bar .info-item:last-child {
+        grid-column: span 2;
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
       }
     }
   </style>
 </head>
-
 <body>
 
-<div class="container">
+<div class="card">
 
-  <h1>Image Resizer</h1>
-  <p class="subtitle">
-    Compress JPG, PNG & WEBP images to required KB or MB size
-  </p>
-
-  <label class="upload-box">
-    <input type="file" id="imageInput" accept="image/*">
-    <div class="upload-icon">📷</div>
-    <div class="upload-text">Click Here to Upload Image</div>
-  </label>
-
-  <div class="preview" id="previewBox">
-    <img id="previewImage" alt="Preview">
+  <div class="header">
+    <div class="badge"><span class="badge-dot"></span> Free Tool</div>
+    <h1>Image <span>Resizer</span></h1>
+    <p class="sub">Compress JPG, PNG &amp; WEBP to an exact KB target — right in your browser</p>
   </div>
 
-  <div class="info" id="imageInfo"></div>
+  <!-- Upload -->
+  <label class="upload-zone" id="uploadZone">
+    <input type="file" id="imageInput" accept="image/*">
+    <div class="upload-icon">🖼️</div>
+    <div class="upload-title">Click to upload or drag &amp; drop</div>
+    <div class="upload-hint">JPG, PNG, WEBP &nbsp;·&nbsp; <span>Any size</span></div>
+  </label>
 
-  <div class="form-group">
-    <label>Target File Size</label>
+  <!-- Preview -->
+  <div class="preview-wrap" id="previewWrap">
+    <img id="previewImg" alt="Preview">
+  </div>
 
-    <div class="size-input">
-      <input type="number" id="targetSize" placeholder="Enter size">
-
-      <select id="sizeUnit">
-        <option value="KB">KB</option>
-        <option value="MB">MB</option>
-      </select>
+  <!-- Info -->
+  <div class="info-bar" id="infoBar">
+    <div class="info-item">
+      <div class="info-label">Original</div>
+      <div class="info-value" id="iOriginal">—</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Output</div>
+      <div class="info-value green" id="iOutput">—</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Dimensions</div>
+      <div class="info-value" id="iDims">—</div>
     </div>
   </div>
 
-  <div class="buttons">
-    <button onclick="resizeImage()">Resize Image</button>
+  <div class="divider">Target size</div>
 
-    <a id="downloadBtn" class="download-btn" download="resized-image.jpg">
-      Download Resized Image
-    </a>
+  <label class="form-label">Enter the size you want</label>
+  <div class="size-row">
+    <input type="number" id="targetSize" placeholder="e.g. 200 (max 1000)" min="1" max="1000" step="any">
+    <div class="unit-toggle">
+      <button class="unit-btn active" id="btnKB">KB</button>
+    </div>
   </div>
 
-  <div class="message" id="message"></div>
+  <button class="btn-resize" id="btnResize" onclick="resizeImage()">
+    <span class="spinner" id="spinner"></span>
+    <span id="btnLabel">⚡ Resize Image</span>
+  </button>
+
+  <a class="btn-download" id="btnDownload" download="resized-image.jpg">⬇ Download Resized Image</a>
+
+  <div class="msg" id="msg"></div>
 
   <canvas id="canvas"></canvas>
-
 </div>
 
 <script>
+  let uploadedImage = null;
+  let originalSizeKB = 0;
+  const imageInput  = document.getElementById('imageInput');
+  const uploadZone  = document.getElementById('uploadZone');
+  const previewWrap = document.getElementById('previewWrap');
+  const previewImg  = document.getElementById('previewImg');
+  const infoBar     = document.getElementById('infoBar');
+  const iOriginal   = document.getElementById('iOriginal');
+  const iOutput     = document.getElementById('iOutput');
+  const iDims       = document.getElementById('iDims');
+  const targetIn    = document.getElementById('targetSize');
+  const btnResize   = document.getElementById('btnResize');
+  const btnLabel    = document.getElementById('btnLabel');
+  const spinner     = document.getElementById('spinner');
+  const btnDownload = document.getElementById('btnDownload');
+  const msgEl       = document.getElementById('msg');
+  const canvas      = document.getElementById('canvas');
+  const ctx         = canvas.getContext('2d');
 
-const imageInput = document.getElementById("imageInput");
-const previewBox = document.getElementById("previewBox");
-const previewImage = document.getElementById("previewImage");
-const imageInfo = document.getElementById("imageInfo");
-const targetSizeInput = document.getElementById("targetSize");
-const sizeUnit = document.getElementById("sizeUnit");
-const downloadBtn = document.getElementById("downloadBtn");
-const message = document.getElementById("message");
-const canvas = document.getElementById("canvas");
+  /* Drag & drop */
+  uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag'); });
+  uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
+  uploadZone.addEventListener('drop', e => {
+    e.preventDefault();
+    uploadZone.classList.remove('drag');
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
 
-let uploadedImage = null;
-let originalFileSizeKB = 0;
+  imageInput.addEventListener('change', function () {
+    if (this.files[0]) handleFile(this.files[0]);
+  });
 
-imageInput.addEventListener("change", function () {
+  function handleFile(file) {
+    if (!file.type.startsWith('image/')) {
+      showMsg('Please upload a valid image (JPG, PNG, WEBP).', 'error');
+      return;
+    }
+    clearMsg();
+    btnDownload.classList.remove('show');
+    iOutput.textContent = '—';
+    originalSizeKB = file.size / 1024;
 
-  const file = this.files[0];
-
-  if (!file) return;
-
-  if (!file.type.startsWith("image/")) {
-    message.style.color = "red";
-    message.textContent = "Please upload a valid image.";
-    return;
-  }
-
-  originalFileSizeKB = file.size / 1024;
-
-  const reader = new FileReader();
-
-  reader.onload = function (e) {
-
-    uploadedImage = new Image();
-
-    uploadedImage.onload = function () {
-
-      previewImage.src = e.target.result;
-
-      previewBox.style.display = "block";
-      imageInfo.style.display = "block";
-
-      imageInfo.innerHTML = `
-        <strong>Original Size:</strong> ${formatSize(originalFileSizeKB)} <br>
-        <strong>Width:</strong> ${uploadedImage.width}px <br>
-        <strong>Height:</strong> ${uploadedImage.height}px
-      `;
-
-      downloadBtn.style.display = "none";
-      message.textContent = "";
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedImage = new Image();
+      uploadedImage.onload = () => {
+        previewImg.src = e.target.result;
+        previewWrap.style.display = 'block';
+        infoBar.classList.add('show');
+        iOriginal.textContent = fmt(originalSizeKB);
+        iDims.textContent = uploadedImage.width + ' × ' + uploadedImage.height;
+      };
+      uploadedImage.src = e.target.result;
     };
-
-    uploadedImage.src = e.target.result;
-  };
-
-  reader.readAsDataURL(file);
-});
-
-function resizeImage() {
-
-  if (!uploadedImage) {
-    message.style.color = "red";
-    message.textContent = "Please upload an image first.";
-    return;
+    reader.readAsDataURL(file);
   }
 
-  let targetSize = parseFloat(targetSizeInput.value);
+  function resizeImage() {
+    if (!uploadedImage) { showMsg('Please upload an image first.', 'error'); return; }
 
-  if (!targetSize || targetSize <= 0) {
-    message.style.color = "red";
-    message.textContent = "Enter valid target size.";
-    return;
+    const raw = parseFloat(targetIn.value);
+    if (!raw || raw <= 0) { showMsg('Enter a valid target size greater than 0.', 'error'); return; }
+    if (raw > 1000) { showMsg('Maximum allowed size is 1000 KB.', 'error'); return; }
+
+    const targetKB = raw;
+
+    clearMsg();
+
+    setBusy(true);
+
+    setTimeout(() => {
+      try {
+        const result = compress(uploadedImage, targetKB);
+        finalize(result);
+      } catch (err) {
+        showMsg('Compression failed. Try a different image.', 'error');
+        setBusy(false);
+      }
+    }, 30);
   }
 
-  if (sizeUnit.value === "MB") {
-    targetSize = targetSize * 1024;
+  function compress(img, targetKB) {
+    canvas.width  = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+
+    /* Binary search quality at full resolution */
+    let lo = 0.01, hi = 0.99, quality = 0.85;
+    let dataUrl, sizeKB;
+
+    for (let i = 0; i < 20; i++) {
+      quality = (lo + hi) / 2;
+      dataUrl = canvas.toDataURL('image/jpeg', quality);
+      sizeKB  = getKB(dataUrl);
+      if (Math.abs(sizeKB - targetKB) < 1) break;
+      if (sizeKB > targetKB) hi = quality;
+      else lo = quality;
+    }
+
+    /* If still over target, scale down dimensions */
+    if (sizeKB > targetKB) {
+      let scale = 0.95;
+      while (sizeKB > targetKB && scale > 0.05) {
+        const newW = Math.max(50, Math.round(img.width  * scale));
+        const newH = Math.max(50, Math.round(img.height * scale));
+        canvas.width  = newW;
+        canvas.height = newH;
+        ctx.drawImage(img, 0, 0, newW, newH);
+
+        lo = 0.01; hi = 0.99;
+        for (let i = 0; i < 20; i++) {
+          quality = (lo + hi) / 2;
+          dataUrl = canvas.toDataURL('image/jpeg', quality);
+          sizeKB  = getKB(dataUrl);
+          if (Math.abs(sizeKB - targetKB) < 1) break;
+          if (sizeKB > targetKB) hi = quality;
+          else lo = quality;
+        }
+        scale -= 0.05;
+      }
+    }
+
+    return { dataUrl, sizeKB, width: canvas.width, height: canvas.height };
   }
 
-  const ctx = canvas.getContext("2d");
+  function finalize({ dataUrl, sizeKB, width, height }) {
+    previewImg.src = dataUrl;
+    iOutput.textContent = fmt(sizeKB);
+    iDims.textContent   = width + ' × ' + height;
+    infoBar.classList.add('show');
 
-  let width = uploadedImage.width;
-  let height = uploadedImage.height;
+    btnDownload.href     = dataUrl;
+    btnDownload.download = 'resized-' + width + 'x' + height + '.jpg';
+    btnDownload.classList.add('show');
 
-  canvas.width = width;
-  canvas.height = height;
-
-  ctx.drawImage(uploadedImage, 0, 0, width, height);
-
-  let quality = 0.95;
-
-  let resizedDataUrl = canvas.toDataURL("image/jpeg", quality);
-
-  let resizedSizeKB = getImageSizeKB(resizedDataUrl);
-
-  while (resizedSizeKB > targetSize && quality > 0.1) {
-
-    quality -= 0.05;
-
-    resizedDataUrl = canvas.toDataURL("image/jpeg", quality);
-
-    resizedSizeKB = getImageSizeKB(resizedDataUrl);
+    if (!msgEl.classList.contains('warn')) {
+      showMsg('✓ Done! Resized to ' + fmt(sizeKB) + ' — ready to download.', 'success');
+    }
+    setBusy(false);
   }
 
-  while (resizedSizeKB > targetSize && width > 200 && height > 200) {
-
-    width *= 0.9;
-    height *= 0.9;
-
-    canvas.width = width;
-    canvas.height = height;
-
-    ctx.drawImage(uploadedImage, 0, 0, width, height);
-
-    quality = 0.85;
-
-    resizedDataUrl = canvas.toDataURL("image/jpeg", quality);
-
-    resizedSizeKB = getImageSizeKB(resizedDataUrl);
+  function getKB(dataUrl) {
+    const b64 = dataUrl.split(',')[1];
+    const pad = b64.endsWith('==') ? 2 : b64.endsWith('=') ? 1 : 0;
+    return (b64.length * 0.75 - pad) / 1024;
   }
 
-  previewImage.src = resizedDataUrl;
-
-  imageInfo.innerHTML = `
-    <strong>Original Size:</strong> ${formatSize(originalFileSizeKB)} <br>
-    <strong>New Size:</strong> ${formatSize(resizedSizeKB)} <br>
-    <strong>Width:</strong> ${Math.round(width)}px <br>
-    <strong>Height:</strong> ${Math.round(height)}px
-  `;
-
-  downloadBtn.href = resizedDataUrl;
-  downloadBtn.style.display = "block";
-
-  message.style.color = "green";
-  message.textContent = "Image resized successfully!";
-}
-
-function getImageSizeKB(dataUrl) {
-
-  const base64 = dataUrl.split(",")[1];
-
-  const sizeInBytes = (base64.length * 3) / 4;
-
-  return sizeInBytes / 1024;
-}
-
-function formatSize(sizeKB){
-
-  if(sizeKB >= 1024){
-    return (sizeKB / 1024).toFixed(2) + " MB";
-  }else{
-    return sizeKB.toFixed(2) + " KB";
+  function fmt(kb) {
+    return kb >= 1024 ? (kb / 1024).toFixed(2) + ' MB' : kb.toFixed(1) + ' KB';
   }
-}
 
+  function showMsg(text, type) {
+    msgEl.textContent = text;
+    msgEl.className   = 'msg ' + type;
+  }
+
+  function clearMsg() {
+    msgEl.className   = 'msg';
+    msgEl.textContent = '';
+  }
+
+  function setBusy(on) {
+    btnResize.disabled       = on;
+    spinner.style.display    = on ? 'block' : 'none';
+    btnLabel.textContent     = on ? 'Compressing…' : '⚡ Resize Image';
+  }
 </script>
 
 </body>
