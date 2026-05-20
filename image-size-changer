@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image Resizer in KB & MB</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Poppins",sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg,#f5f7fa,#dfe9f3);
+      padding:20px;
+    }
+
+    .container{
+      width:100%;
+      max-width:540px;
+      background:#fff;
+      padding:30px;
+      border-radius:24px;
+      box-shadow:0 20px 50px rgba(0,0,0,0.12);
+    }
+
+    h1{
+      text-align:center;
+      color:#111827;
+      margin-bottom:10px;
+      font-size:30px;
+    }
+
+    .subtitle{
+      text-align:center;
+      color:#6b7280;
+      margin-bottom:25px;
+      font-size:14px;
+    }
+
+    .upload-box{
+      border:2px dashed #6366f1;
+      border-radius:18px;
+      background:#f8f9ff;
+      padding:35px 20px;
+      text-align:center;
+      cursor:pointer;
+      transition:0.3s;
+      margin-bottom:20px;
+    }
+
+    .upload-box:hover{
+      background:#eef2ff;
+      transform:translateY(-2px);
+    }
+
+    .upload-box input{
+      display:none;
+    }
+
+    .upload-icon{
+      font-size:42px;
+      margin-bottom:10px;
+    }
+
+    .upload-text{
+      font-size:15px;
+      font-weight:600;
+      color:#374151;
+    }
+
+    .preview{
+      display:none;
+      margin:20px 0;
+      text-align:center;
+    }
+
+    .preview img{
+      max-width:100%;
+      max-height:260px;
+      border-radius:16px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .info{
+      display:none;
+      background:#f3f4f6;
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:20px;
+      font-size:14px;
+      line-height:1.8;
+      color:#374151;
+    }
+
+    .form-group{
+      margin-bottom:18px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:8px;
+      font-size:14px;
+      font-weight:600;
+      color:#374151;
+    }
+
+    .size-input{
+      display:flex;
+      gap:10px;
+    }
+
+    input[type="number"]{
+      flex:1;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid #d1d5db;
+      outline:none;
+      font-size:15px;
+    }
+
+    select{
+      width:110px;
+      border-radius:14px;
+      border:1px solid #d1d5db;
+      padding:14px;
+      font-size:15px;
+      outline:none;
+      cursor:pointer;
+      background:#fff;
+    }
+
+    input[type="number"]:focus,
+    select:focus{
+      border-color:#6366f1;
+      box-shadow:0 0 0 4px rgba(99,102,241,0.15);
+    }
+
+    .buttons{
+      display:grid;
+      gap:12px;
+    }
+
+    button,
+    .download-btn{
+      border:none;
+      padding:15px;
+      border-radius:14px;
+      font-size:15px;
+      font-weight:600;
+      cursor:pointer;
+      transition:0.3s;
+      text-align:center;
+      text-decoration:none;
+    }
+
+    button{
+      background:linear-gradient(135deg,#6366f1,#8b5cf6);
+      color:#fff;
+    }
+
+    button:hover{
+      transform:translateY(-2px);
+      box-shadow:0 10px 22px rgba(99,102,241,0.35);
+    }
+
+    .download-btn{
+      display:none;
+      background:#111827;
+      color:#fff;
+    }
+
+    .download-btn:hover{
+      background:#000;
+      transform:translateY(-2px);
+    }
+
+    .message{
+      margin-top:15px;
+      text-align:center;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    canvas{
+      display:none;
+    }
+
+    @media(max-width:480px){
+      .container{
+        padding:22px;
+      }
+
+      h1{
+        font-size:24px;
+      }
+
+      .size-input{
+        flex-direction:column;
+      }
+
+      select{
+        width:100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Image Resizer</h1>
+  <p class="subtitle">
+    Compress JPG, PNG & WEBP images to required KB or MB size
+  </p>
+
+  <label class="upload-box">
+    <input type="file" id="imageInput" accept="image/*">
+    <div class="upload-icon">📷</div>
+    <div class="upload-text">Click Here to Upload Image</div>
+  </label>
+
+  <div class="preview" id="previewBox">
+    <img id="previewImage" alt="Preview">
+  </div>
+
+  <div class="info" id="imageInfo"></div>
+
+  <div class="form-group">
+    <label>Target File Size</label>
+
+    <div class="size-input">
+      <input type="number" id="targetSize" placeholder="Enter size">
+
+      <select id="sizeUnit">
+        <option value="KB">KB</option>
+        <option value="MB">MB</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="resizeImage()">Resize Image</button>
+
+    <a id="downloadBtn" class="download-btn" download="resized-image.jpg">
+      Download Resized Image
+    </a>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <canvas id="canvas"></canvas>
+
+</div>
+
+<script>
+
+const imageInput = document.getElementById("imageInput");
+const previewBox = document.getElementById("previewBox");
+const previewImage = document.getElementById("previewImage");
+const imageInfo = document.getElementById("imageInfo");
+const targetSizeInput = document.getElementById("targetSize");
+const sizeUnit = document.getElementById("sizeUnit");
+const downloadBtn = document.getElementById("downloadBtn");
+const message = document.getElementById("message");
+const canvas = document.getElementById("canvas");
+
+let uploadedImage = null;
+let originalFileSizeKB = 0;
+
+imageInput.addEventListener("change", function () {
+
+  const file = this.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    message.style.color = "red";
+    message.textContent = "Please upload a valid image.";
+    return;
+  }
+
+  originalFileSizeKB = file.size / 1024;
+
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+
+    uploadedImage = new Image();
+
+    uploadedImage.onload = function () {
+
+      previewImage.src = e.target.result;
+
+      previewBox.style.display = "block";
+      imageInfo.style.display = "block";
+
+      imageInfo.innerHTML = `
+        <strong>Original Size:</strong> ${formatSize(originalFileSizeKB)} <br>
+        <strong>Width:</strong> ${uploadedImage.width}px <br>
+        <strong>Height:</strong> ${uploadedImage.height}px
+      `;
+
+      downloadBtn.style.display = "none";
+      message.textContent = "";
+    };
+
+    uploadedImage.src = e.target.result;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+function resizeImage() {
+
+  if (!uploadedImage) {
+    message.style.color = "red";
+    message.textContent = "Please upload an image first.";
+    return;
+  }
+
+  let targetSize = parseFloat(targetSizeInput.value);
+
+  if (!targetSize || targetSize <= 0) {
+    message.style.color = "red";
+    message.textContent = "Enter valid target size.";
+    return;
+  }
+
+  if (sizeUnit.value === "MB") {
+    targetSize = targetSize * 1024;
+  }
+
+  const ctx = canvas.getContext("2d");
+
+  let width = uploadedImage.width;
+  let height = uploadedImage.height;
+
+  canvas.width = width;
+  canvas.height = height;
+
+  ctx.drawImage(uploadedImage, 0, 0, width, height);
+
+  let quality = 0.95;
+
+  let resizedDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+  let resizedSizeKB = getImageSizeKB(resizedDataUrl);
+
+  while (resizedSizeKB > targetSize && quality > 0.1) {
+
+    quality -= 0.05;
+
+    resizedDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+    resizedSizeKB = getImageSizeKB(resizedDataUrl);
+  }
+
+  while (resizedSizeKB > targetSize && width > 200 && height > 200) {
+
+    width *= 0.9;
+    height *= 0.9;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    ctx.drawImage(uploadedImage, 0, 0, width, height);
+
+    quality = 0.85;
+
+    resizedDataUrl = canvas.toDataURL("image/jpeg", quality);
+
+    resizedSizeKB = getImageSizeKB(resizedDataUrl);
+  }
+
+  previewImage.src = resizedDataUrl;
+
+  imageInfo.innerHTML = `
+    <strong>Original Size:</strong> ${formatSize(originalFileSizeKB)} <br>
+    <strong>New Size:</strong> ${formatSize(resizedSizeKB)} <br>
+    <strong>Width:</strong> ${Math.round(width)}px <br>
+    <strong>Height:</strong> ${Math.round(height)}px
+  `;
+
+  downloadBtn.href = resizedDataUrl;
+  downloadBtn.style.display = "block";
+
+  message.style.color = "green";
+  message.textContent = "Image resized successfully!";
+}
+
+function getImageSizeKB(dataUrl) {
+
+  const base64 = dataUrl.split(",")[1];
+
+  const sizeInBytes = (base64.length * 3) / 4;
+
+  return sizeInBytes / 1024;
+}
+
+function formatSize(sizeKB){
+
+  if(sizeKB >= 1024){
+    return (sizeKB / 1024).toFixed(2) + " MB";
+  }else{
+    return sizeKB.toFixed(2) + " KB";
+  }
+}
+
+</script>
+
+</body>
+</html>
