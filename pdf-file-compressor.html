@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Compressor · custom size</title>
+  <title>PDF Compressor - Real Compression</title>
   <link rel="icon" type="image/png" href="favicon.logo.png">
   <style>
     * {
@@ -24,17 +24,15 @@
       background: #ffffff;
       padding: 28px 24px;
       border-radius: 24px;
-      max-width: 640px;
+      max-width: 680px;
       width: 100%;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-      transition: 0.2s;
     }
     h1 {
       font-size: 26px;
       font-weight: 600;
       color: #c4001d;
       margin-bottom: 8px;
-      letter-spacing: -0.3px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -48,6 +46,7 @@
       background: #fef0f2;
       border-radius: 0 12px 12px 0;
       line-height: 1.4;
+      padding: 8px 14px;
     }
     .drop-zone {
       border: 2px dashed #c4001d;
@@ -174,7 +173,6 @@
     .btn:hover:not(:disabled) {
       background: #a30017;
       transform: scale(0.98);
-      box-shadow: 0 4px 10px rgba(196, 0, 29, 0.25);
     }
     .btn:disabled {
       background: #b8bcca;
@@ -197,7 +195,7 @@
       width: 0%;
       background: #c4001d;
       border-radius: 40px;
-      transition: width 0.25s ease;
+      transition: width 0.3s ease;
     }
     .status {
       margin: 16px 0 8px 0;
@@ -220,7 +218,7 @@
       background: #e3f3e9;
       color: #1e6b3b;
     }
-    .status .badge {
+    .status .page-info {
       background: #c4001d10;
       padding: 2px 12px;
       border-radius: 40px;
@@ -252,7 +250,7 @@
 <body>
 <div class="card">
   <h1>📄 PDF Compressor</h1>
-  <div class="sub">custom compression · choose your quality/size balance</div>
+  <div class="sub">🔥 Real image compression · choose your quality/size balance</div>
 
   <div class="drop-zone" id="dropZone">
     <p>📎 Drag & drop your PDF here</p>
@@ -267,11 +265,11 @@
 
   <div class="controls">
     <div class="slider-group">
-      <label for="qualitySlider">Compression</label>
-      <input type="range" id="qualitySlider" min="10" max="90" value="65">
-      <span class="slider-value" id="sliderLabel">65%</span>
+      <label for="qualitySlider">Quality</label>
+      <input type="range" id="qualitySlider" min="10" max="90" value="60">
+      <span class="slider-value" id="sliderLabel">60%</span>
     </div>
-    <button class="btn" id="compressBtn" disabled>⚡ Compress PDF</button>
+    <button class="btn" id="compressBtn" disabled>⬇ Compress PDF</button>
   </div>
 
   <div class="progress-wrap" id="progressWrap">
@@ -283,9 +281,13 @@
   <div class="privacy"><span>🔒 100% client-side · your files stay private</span></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   (function() {
+    // Configure PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const compressBtn = document.getElementById('compressBtn');
@@ -298,12 +300,10 @@
     const qualitySlider = document.getElementById('qualitySlider');
     const sliderLabel = document.getElementById('sliderLabel');
 
-    // ----- state -----
-    let selectedFile = null;         // File object
-    let fileArrayBuffer = null;      // cached for compression
+    let selectedFile = null;
+    let fileArrayBuffer = null;
     let isProcessing = false;
 
-    // ----- UI helpers -----
     function setStatus(msg, type = 'info') {
       statusDiv.textContent = msg;
       statusDiv.className = 'status';
@@ -330,7 +330,6 @@
       fileMeta.style.display = 'flex';
     }
 
-    // ----- handle file (validate & cache) -----
     async function handleFile(file) {
       if (!file || file.type !== 'application/pdf') {
         resetUI(false);
@@ -340,33 +339,28 @@
       }
       if (file.size > 50 * 1024 * 1024) {
         resetUI(false);
-        setStatus('⚠️ File exceeds 50 MB limit. Please choose a smaller PDF.', 'error');
+        setStatus('⚠️ File exceeds 50 MB limit.', 'error');
         fileInput.value = '';
         return;
       }
 
       try {
-        // read file as arrayBuffer for later compression
         const buffer = await file.arrayBuffer();
         fileArrayBuffer = buffer;
         selectedFile = file;
         showFileMeta(file);
         compressBtn.disabled = false;
-        setStatus(`✅ ${file.name}  (${(file.size / 1024 / 1024).toFixed(2)} MB) ready`, 'info');
-        // reset progress
+        setStatus(`✅ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB) ready`, 'info');
         progressWrap.style.display = 'none';
         progressFill.style.width = '0%';
       } catch (err) {
-        console.warn('read error', err);
         resetUI(false);
-        setStatus('⚠️ Could not read file. Please try again.', 'error');
+        setStatus('⚠️ Could not read file.', 'error');
         fileInput.value = '';
       }
     }
 
-    // ----- drag & drop + click -----
     dropZone.addEventListener('click', () => fileInput.click());
-
     dropZone.addEventListener('dragover', (e) => {
       e.preventDefault();
       dropZone.classList.add('dragover');
@@ -379,7 +373,7 @@
       dropZone.classList.remove('dragover');
       const file = e.dataTransfer.files[0];
       if (file) {
-        fileInput.files = e.dataTransfer.files; // sync
+        fileInput.files = e.dataTransfer.files;
         handleFile(file);
       }
     });
@@ -390,84 +384,143 @@
       else resetUI(false);
     });
 
-    // ----- slider label update -----
     qualitySlider.addEventListener('input', () => {
       sliderLabel.textContent = qualitySlider.value + '%';
     });
 
-    // ----- compress logic (uses custom compression factor) -----
+    // REAL COMPRESSION USING PDF.JS + JSPDF
     async function compressPDF() {
       if (!selectedFile || !fileArrayBuffer) {
-        setStatus('⚠️ No file loaded. Please select a PDF.', 'error');
+        setStatus('⚠️ No file loaded.', 'error');
         return;
       }
       if (isProcessing) return;
       isProcessing = true;
       compressBtn.disabled = true;
 
-      // show progress
       progressWrap.style.display = 'block';
       progressFill.style.width = '0%';
-      setStatus('⏳ Compressing…', 'info');
+      setStatus('⏳ Loading PDF…', 'info');
 
       try {
-        // read quality slider value (0-100) -> map to compression factor (0.3 .. 0.95)
-        const raw = parseInt(qualitySlider.value, 10);
-        // clamp between 10 and 90
-        const clamped = Math.min(90, Math.max(10, raw));
-        // map: 10% -> 0.30 (aggressive), 90% -> 0.92 (light)
-        const factor = 0.30 + (clamped - 10) * (0.62 / 80);  // 0.30 .. 0.92
-        const compressionFactor = Math.min(0.92, Math.max(0.30, factor));
-
-        // load pdf
-        const pdfDoc = await PDFLib.PDFDocument.load(fileArrayBuffer, { ignoreEncryption: true });
-        const pageCount = pdfDoc.getPageCount();
-
-        // create new doc
-        const newDoc = await PDFLib.PDFDocument.create();
-
-        // copy pages
-        for (let i = 0; i < pageCount; i++) {
-          const [copiedPage] = await newDoc.copyPages(pdfDoc, [i]);
-          newDoc.addPage(copiedPage);
+        const quality = parseInt(qualitySlider.value, 10);
+        // Map quality to JPEG quality (10-90 -> 10-90)
+        const jpegQuality = Math.max(10, Math.min(90, quality));
+        
+        // Load PDF with pdf.js
+        const loadingTask = pdfjsLib.getDocument({ data: fileArrayBuffer });
+        const pdf = await loadingTask.promise;
+        const pageCount = pdf.numPages;
+        
+        progressFill.style.width = '20%';
+        setStatus(`⏳ Processing ${pageCount} pages…`, 'info');
+        
+        // Create new PDF with jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Get first page to determine dimensions
+        const firstPage = await pdf.getPage(1);
+        const viewport = firstPage.getViewport({ scale: 1 });
+        const pdfWidth = viewport.width;
+        const pdfHeight = viewport.height;
+        
+        // Calculate scale factor based on quality
+        // Lower quality = smaller images
+        const scaleFactor = 0.3 + (quality / 100) * 0.7; // 0.37 to 1.0
+        const scaledWidth = pdfWidth * scaleFactor;
+        const scaledHeight = pdfHeight * scaleFactor;
+        
+        // Create jsPDF with correct orientation
+        const orientation = pdfWidth > pdfHeight ? 'landscape' : 'portrait';
+        const unit = 'pt';
+        const format = [pdfWidth, pdfHeight];
+        
+        // We'll create the PDF page by page using jsPDF
+        let pdfDoc = null;
+        let pageImages = [];
+        
+        // Render each page
+        for (let i = 1; i <= pageCount; i++) {
+          const page = await pdf.getPage(i);
+          const viewport = page.getViewport({ scale: scaleFactor });
+          
+          // Prepare canvas
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          
+          // Render page to canvas
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          
+          progressFill.style.width = `${20 + (i / pageCount) * 50}%`;
+          setStatus(`⏳ Rendering page ${i}/${pageCount}…`, 'info');
+          
+          await page.render(renderContext).promise;
+          
+          // Convert to JPEG with quality setting
+          const imageData = canvas.toDataURL('image/jpeg', jpegQuality / 100);
+          pageImages.push({
+            data: imageData,
+            width: viewport.width,
+            height: viewport.height
+          });
+          
+          // Clean up
+          canvas.remove();
         }
-
-        // update progress (simulate)
-        progressFill.style.width = '40%';
-        await new Promise(r => setTimeout(r, 120));
-
-        // save with custom compression (useObjectStreams: false for better compatibility)
-        const compressedBytes = await newDoc.save({
-          useObjectStreams: false,
-          // pdf-lib doesn't expose direct quality, but we use the factor to scale bytes (simulate)
-          // we apply a "virtual" size reduction using factor to demonstrate custom compression
-          // we actually compress via pdf-lib, then apply factor to final size for demonstration
+        
+        progressFill.style.width = '80%';
+        setStatus('⏳ Creating compressed PDF…', 'info');
+        
+        // Create new PDF with jsPDF
+        // Use the first page dimensions
+        const firstImage = pageImages[0];
+        const pdfWidthPt = firstImage.width;
+        const pdfHeightPt = firstImage.height;
+        
+        // Create PDF with correct dimensions
+        const pdfDocNew = new jsPDF({
+          orientation: pdfWidthPt > pdfHeightPt ? 'landscape' : 'portrait',
+          unit: 'pt',
+          format: [pdfWidthPt, pdfHeightPt],
+          compress: true
         });
-
+        
+        // Add each page as image
+        for (let i = 0; i < pageImages.length; i++) {
+          if (i > 0) {
+            pdfDocNew.addPage([pdfWidthPt, pdfHeightPt]);
+          }
+          
+          const img = pageImages[i];
+          pdfDocNew.addImage(
+            img.data,
+            'JPEG',
+            0,
+            0,
+            img.width,
+            img.height,
+            undefined,
+            'FAST'
+          );
+        }
+        
+        // Save the PDF
+        const compressedPdfBytes = pdfDocNew.output('arraybuffer');
+        
+        progressFill.style.width = '95%';
+        await new Promise(r => setTimeout(r, 100));
+        
+        // Calculate sizes
         const originalSize = fileArrayBuffer.byteLength;
-        const rawCompressedSize = compressedBytes.length;
-
-        // apply custom factor (simulate variable compression)
-        // we don't alter the actual bytes, we just report a simulated effective size
-        // but we also keep the real compressed bytes for download.
-        // To make it "working with different size" we use factor to adjust reported size
-        // and also we re-encode with a simple trick: if factor is low (aggressive) we
-        // use a more aggressive save (but pdf-lib doesn't have quality param)
-        // we simulate by applying factor to the final size for reporting & we keep
-        // the actual compressed bytes as is (still compressed by pdf-lib).
-        // For real variability we could re-compress with different settings,
-        // but pdf-lib doesn't support quality. However we want to show "custom size"
-        // so we report effective size based on factor.
-        // we also store a "virtual" size for download? We use actual compressed bytes.
-        // but we report factor-adjusted size.
-
-        // we compute a "virtual" compressed size based on factor
-        const virtualCompressedSize = Math.min(originalSize, Math.round(rawCompressedSize * compressionFactor * 0.85 + 200));
-        // ensure it's not larger than original
-        const effectiveSize = Math.min(originalSize, Math.max(1024, virtualCompressedSize));
-
-        // prepare download (actual compressed bytes)
-        const blob = new Blob([compressedBytes], { type: 'application/pdf' });
+        const compressedSize = compressedPdfBytes.byteLength;
+        
+        // Download
+        const blob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
@@ -477,52 +530,38 @@
         link.click();
         document.body.removeChild(link);
         setTimeout(() => URL.revokeObjectURL(url), 5000);
-
-        // --- compute stats ---
-        const reduction = ((originalSize - effectiveSize) / originalSize * 100);
+        
+        // Calculate reduction
+        const reduction = ((originalSize - compressedSize) / originalSize * 100);
         const reductionFixed = Math.max(0, Math.min(100, reduction));
-        const sizeMB = (effectiveSize / (1024 * 1024)).toFixed(2);
+        const sizeMB = (compressedSize / (1024 * 1024)).toFixed(2);
         const origMB = (originalSize / (1024 * 1024)).toFixed(2);
-
+        
         progressFill.style.width = '100%';
-
+        
         setStatus(
-          `✅ Done!  ${sizeMB} MB  (${reductionFixed.toFixed(1)}% smaller)  ·  ${pageCount} pages  ·  custom factor ${(compressionFactor*100).toFixed(0)}%`,
+          `✅ Compressed! ${sizeMB} MB (${reductionFixed.toFixed(1)}% smaller) · ${pageCount} pages · Quality ${quality}%`,
           'success'
         );
-
-        // keep file loaded, enable button again
+        
         compressBtn.disabled = false;
         isProcessing = false;
-        // hide progress after a moment
+        
         setTimeout(() => {
           progressWrap.style.display = 'none';
           progressFill.style.width = '0%';
-        }, 1200);
-
+        }, 1500);
+        
       } catch (err) {
         console.error('Compression error:', err);
-        setStatus('❌ Compression failed. Try a different PDF or lower settings.', 'error');
+        setStatus(`❌ Compression failed: ${err.message || 'Unknown error'}`, 'error');
         progressWrap.style.display = 'none';
         compressBtn.disabled = false;
         isProcessing = false;
       }
     }
 
-    // ----- event listener for compress button -----
     compressBtn.addEventListener('click', compressPDF);
-
-    // ----- reset if user clicks on file input but cancels -----
-    window.addEventListener('focus', () => {
-      // if file input is empty but we have a file selected?  keep consistent
-      if (fileInput.files.length === 0 && selectedFile) {
-        // user might have cleared input, but we keep file loaded
-        // do nothing, we keep the file.
-      }
-    });
-
-    // extra: if user selects a new file via input while one is loaded, handleFile will replace
-    // we also reset on error
     resetUI(false);
   })();
 </script>
